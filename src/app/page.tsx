@@ -180,17 +180,33 @@ function HomeContent() {
         if (userQuizpackId) {
           await resetUserQuizpack(userQuizpackId);
         }
-        setShowRestartDialog(false);
         router.push(`/quiz/${selectedPackId}?restart=true`);
       } catch (err) {
         console.error('퀴즈팩 초기화 실패:', err);
       }
     };
 
-    // 다시풀기도 in_progress 체크 필요 (다른 퀴즈팩이 진행 중일 수 있음)
-    setShowRestartDialog(false);
-    checkInProgressAndExecute(selectedPackId, executeRestart);
-  }, [selectedPackId, dbUser?.id, router, checkInProgressAndExecute]);
+    if (!dbUser?.id) return;
+
+    try {
+      const existing = await getInProgressQuizpack(dbUser.id, selectedPackId);
+      if (existing) {
+        // 진행 중인 퀴즈팩이 있으면: RestartDialog 먼저 닫은 후 AbortDialog 열기
+        setShowRestartDialog(false);
+        setInProgressPack(existing);
+        setPendingAction(() => executeRestart);
+        setShowAbortDialog(true);
+      } else {
+        // 없으면: RestartDialog 닫고 바로 실행
+        setShowRestartDialog(false);
+        executeRestart();
+      }
+    } catch (err) {
+      console.error('진행 중 퀴즈팩 체크 실패:', err);
+      setShowRestartDialog(false);
+      executeRestart();
+    }
+  }, [selectedPackId, dbUser?.id, router]);
 
   // AbortConfirmDialog 확인 핸들러 (기존 진행 중 퀴즈팩 중단 + 새 퀴즈팩 시작)
   const handleAbortConfirm = useCallback(async () => {
