@@ -176,8 +176,8 @@ export default function ProfilePage() {
                     <div className="bg-white rounded-2xl border border-gray-200 p-6">
                         {/* 프로필 아이콘 + 닉네임 */}
                         <div className="flex flex-col items-center gap-4">
-                            <div className="w-24 h-24 rounded-full flex items-center justify-center" style={{ backgroundColor: '#2D2D2D' }}>
-                                <CircleUser className="w-18 h-18" color="#FF8400" strokeWidth={1.5} />
+                            <div className="w-24 h-24 rounded-full flex items-center justify-center" style={{ backgroundColor: '#ecececff' }}>
+                                <CircleUser className="w-18 h-18" color="#2D2D2D" strokeWidth={1.8} />
                             </div>
 
                             {/* 닉네임 영역 */}

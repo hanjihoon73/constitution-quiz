@@ -2,25 +2,19 @@
 
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Lock, LockOpen, SquareCheckBig, Star, SquareArrowRight } from 'lucide-react';
+import { Lock, Play, Pause, CircleCheckBig, Star } from 'lucide-react';
 import { QuizpackWithStatus } from '@/lib/api/quizpacks';
 
 interface QuizpackCardProps {
     quizpack: QuizpackWithStatus;
-    onCompletedClick?: (quizpackId: number) => void;  // 완료된 퀴즈팩 클릭 콜백
-    onOpenedClick?: (quizpackId: number) => void;  // 열림 퀴즈팩 클릭 콜백
-    isCurrent?: boolean;  // 현재 풀어야 할 퀴즈팩 여부
+    onCompletedClick?: (quizpackId: number) => void;
+    onOpenedClick?: (quizpackId: number) => void;
+    isCurrent?: boolean;
 }
 
-/**
- * 퀴즈팩 카드 컴포넌트
- * - 상태별 스타일 적용
- * - 클릭 시 상태에 따른 동작
- */
 export function QuizpackCard({ quizpack, onCompletedClick, onOpenedClick, isCurrent }: QuizpackCardProps) {
     const router = useRouter();
 
-    // 클릭 핸들러
     const handleClick = () => {
         switch (quizpack.status) {
             case 'closed':
@@ -37,7 +31,6 @@ export function QuizpackCard({ quizpack, onCompletedClick, onOpenedClick, isCurr
                 router.push(`/quiz/${quizpack.id}?resume=true`);
                 break;
             case 'completed':
-                // 완료된 퀴즈팩은 콜백이 있으면 호출, 없으면 바로 진입
                 if (onCompletedClick) {
                     onCompletedClick(quizpack.id);
                 } else {
@@ -47,101 +40,71 @@ export function QuizpackCard({ quizpack, onCompletedClick, onOpenedClick, isCurr
         }
     };
 
-    // 클릭 핸들러 (유지)
-
-    // 진행률 계산
     const progressPercent =
         quizpack.status === 'in_progress' && quizpack.solvedQuizCount && quizpack.totalQuizCount
             ? Math.round((quizpack.solvedQuizCount / quizpack.totalQuizCount) * 100)
             : 0;
 
-    // 상태별 스타일 클래스
-    const getStatusStyles = () => {
+    // 컨테이너 스타일 결정
+    const getContainerClasses = () => {
+        const base = "rounded-[16px] p-5 mb-3 transition-all duration-200 active:scale-[0.98]";
         switch (quizpack.status) {
             case 'closed':
-                return 'bg-gray-50 border-gray-200';
+                return `${base} bg-gray-100 border border-gray-300 cursor-default`;
             case 'opened':
+                return `${base} bg-white border border-gray-300 cursor-pointer hover:shadow-lg hover:-translate-y-1`;
             case 'in_progress':
+                return `${base} bg-white border border-[#FF8400] cursor-pointer hover:shadow-lg hover:-translate-y-1`;
             case 'completed':
-                return 'hover:shadow-lg hover:-translate-y-1 transition-transform duration-200';
+                return `${base} bg-white border border-gray-300 cursor-pointer hover:shadow-lg hover:-translate-y-1`;
             default:
-                return 'bg-white border-gray-200';
+                return `${base} bg-white border border-gray-200`;
+        }
+    };
+
+    // 아이콘 반환 함수
+    const renderIcon = () => {
+        switch (quizpack.status) {
+            case 'closed':
+                return <Lock className="w-12 h-12 text-gray-400 stroke-[1.5]" />;
+            case 'opened':
+                return <Play className="w-12 h-12 text-[#FF8400] stroke-[1.5]" />;
+            case 'in_progress':
+                return <Pause className="w-12 h-12 text-[#FF8400] stroke-[1.5]" />;
+            case 'completed':
+                return <CircleCheckBig className="w-12 h-12 text-[#2D2D2D] stroke-[1.5]" />;
+            default:
+                return null;
         }
     };
 
     return (
-        <div
-            onClick={handleClick}
-            style={{
-                backgroundColor: quizpack.status === 'closed' ? '#eeeeeeff' :
-                    quizpack.status === 'opened' ? '#fba03fff' :
-                        quizpack.status === 'in_progress' ? '#ff8400' :
-                            quizpack.status === 'completed' ? '#2D2D2D' : '#ffffff',
-                border: (quizpack.status === 'completed' || quizpack.status === 'opened' || quizpack.status === 'in_progress')
-                    ? 'none'
-                    : `1px solid ${quizpack.status === 'closed' ? '#eaecf0ff' : '#e5e7eb'}`,
-                borderRadius: '16px',
-                padding: '20px',
-                marginBottom: '12px',
-                cursor: quizpack.status === 'closed' ? 'default' : 'pointer',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                transition: 'all 0.2s ease-out',
-            }}
-            className={`${getStatusStyles()} active:scale-[0.98]`}
-        >
+        <div onClick={handleClick} className={getContainerClasses()}>
             {/* 상단: 순서 번호 + 상태 아이콘 */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '12px'
-            }}>
-                <span style={{
-                    fontSize: '20px',
-                    fontWeight: 'bold',
-                    color: (quizpack.status === 'opened' || quizpack.status === 'in_progress') ? '#2D2D2D' :
-                        quizpack.status === 'completed' ? '#FF8400' : '#9d9d9dff'
-                }}>
+            <div className="flex justify-between items-start mb-3">
+                <span className={`text-[30px] font-bold leading-none ${quizpack.status === 'closed' ? 'text-gray-400' :
+                    quizpack.status === 'opened' || quizpack.status === 'in_progress' ? 'text-[#FF8400]' :
+                        'text-[#2D2D2D]'
+                    }`}>
                     {String(quizpack.order).padStart(3, '0')}
                 </span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {quizpack.status === 'closed' && (
-                        <Lock className="w-5 h-5 text-gray-400" />
-                    )}
-                    {quizpack.status === 'opened' && (
-                        <LockOpen color="#2D2D2D" className="w-5 h-5" />
-                    )}
-                    {quizpack.status === 'in_progress' && (
-                        <SquareArrowRight color="#2D2D2D" className="w-5 h-5" />
-                    )}
-                    {quizpack.status === 'completed' && (
-                        <SquareCheckBig color="#FF8400" className="w-5 h-5" />
-                    )}
+                <div>
+                    {renderIcon()}
                 </div>
             </div>
 
             {/* 키워드 태그 */}
-            <div className="flex flex-wrap gap-1.5 mb-3 mt-1">
+            <div className="flex flex-wrap gap-1.5 mb-3">
                 {quizpack.keywords.split(',').map((k, i) => {
                     const isClosed = quizpack.status === 'closed';
-                    const isCompleted = quizpack.status === 'completed';
-                    const isOpenedOrInProgress = quizpack.status === 'opened' || quizpack.status === 'in_progress';
-
-                    let tagClass = 'bg-blue-50 text-blue-600 border border-blue-100';
-                    let tagStyle = {};
-
-                    if (isClosed) {
-                        tagClass = 'bg-gray-200 text-gray-600';
-                    } else if (isCompleted) {
-                        tagClass = '';
-                        tagStyle = { backgroundColor: '#000000ff', color: '#FF8400' };
-                    } else if (isOpenedOrInProgress) {
-                        tagClass = '';
-                        tagStyle = { backgroundColor: '#2D2D2D', color: '#FF8400' };
-                    }
+                    const tagTheme = isClosed
+                        ? 'bg-[#E5E7EB] text-[#9CA3AF]'
+                        : quizpack.status === 'completed'
+                            ? 'bg-[#2D2D2D] text-gray-300'
+                            : 'bg-[#2D2D2D] text-[#FF8400]';
 
                     return (
-                        <span key={i} className={`px-2 py-1 rounded-md text-[13px] font-medium ${tagClass}`} style={tagStyle}>
+                        <span key={i} className={`px-2 py-[2px] rounded-md text-[13px] font-medium ${tagTheme}`}>
                             #{k.trim()}
                         </span>
                     );
@@ -149,72 +112,61 @@ export function QuizpackCard({ quizpack, onCompletedClick, onOpenedClick, isCurr
             </div>
 
             {/* 퀴즈 개수 */}
-            <p style={{
-                fontSize: '12px',
-                color: (quizpack.status === 'completed' || quizpack.status === 'opened' || quizpack.status === 'in_progress') ? '#ffffff' : '#9ca3af',
-                marginBottom: '12px'
-            }}>
+            <p className={`text-[13px] mb-3 ${quizpack.status === 'closed' ? 'text-gray-400' : 'text-gray-600'}`}>
                 퀴즈 {quizpack.quizCount}개
             </p>
 
-            {/* 진행 상태 표시 */}
-            {quizpack.status === 'in_progress' && (
-                <div style={{ marginBottom: '12px' }}>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        fontSize: '12px',
-                        color: '#ffffff',
-                        fontWeight: '600',
-                        marginBottom: '6px'
-                    }}>
-                        <span>{progressPercent}%</span>
+            {/* 하단 영역 (상태에 따라 유동적) */}
+            {quizpack.status === 'in_progress' ? (
+                <div>
+                    {/* 진행중 - 풀고 있는 중이에요 & 별점 */}
+                    <div className="flex justify-between items-end mb-2">
+                        <span className="text-[#FF8400] text-[13px] font-medium">풀고 있는 중이에요</span>
+                        {quizpack.averageRating !== null && quizpack.averageRating > 0 && (
+                            <div className="flex items-center text-[13px] text-gray-700 font-medium">
+                                <Star className="w-[14px] h-[14px] mr-1 text-[#FF8400] fill-[#FF8400]" />
+                                {quizpack.averageRating.toFixed(1)}
+                            </div>
+                        )}
                     </div>
-                    <div style={{
-                        width: '100%',
-                        height: '6px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                        borderRadius: '3px',
-                        overflow: 'hidden'
-                    }}>
-                        <div style={{
-                            width: `${progressPercent}%`,
-                            height: '100%',
-                            backgroundColor: '#2D2D2D',
-                            transition: 'width 0.3s ease'
-                        }} />
+                    {/* 진행 상황 바 */}
+                    <div className="flex items-center gap-3">
+                        <div className="flex-1 h-[8px] bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-[#FF8400] transition-all duration-300 rounded-full"
+                                style={{ width: `${progressPercent}%` }}
+                            />
+                        </div>
+                        <span className="text-[13px] text-gray-500 font-medium min-w-[32px] text-right">
+                            {progressPercent}%
+                        </span>
                     </div>
                 </div>
-            )}
-
-            {/* 하단: 정답률 & 별점 */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                fontSize: '12px'
-            }}>
-                <span style={{ color: (quizpack.status === 'completed' || quizpack.status === 'opened' || quizpack.status === 'in_progress') ? '#ffffff' : '#6b7280' }}>
-                    {quizpack.status === 'in_progress'
-                        ? '진행 중이에요'
-                        : quizpack.userCorrectRate !== null
-                            ? `정답률 ${Math.round(quizpack.userCorrectRate)}%`
-                            : '아직 풀지 않았어요'}
-                </span>
-                {quizpack.averageRating !== null && (
-                    <span style={{
-                        color: (quizpack.status === 'opened' || quizpack.status === 'in_progress') ? '#ffffff' : '#f59e0b',
-                        display: 'flex',
-                        alignItems: 'center'
-                    }}>
-                        <Star className="w-4 h-4 mr-2"
-                            color={(quizpack.status === 'opened' || quizpack.status === 'in_progress') ? '#ffffff' : '#FF8400'}
-                            fill={(quizpack.status === 'opened' || quizpack.status === 'in_progress') ? '#ffffff' : '#FF8400'}
-                        />
-                        {quizpack.averageRating.toFixed(1)}
+            ) : (
+                <div className="flex justify-between items-center text-[13px] font-medium">
+                    {/* 일반 상태 (닫힘/열림/완료) - 좌측 메시지 */}
+                    <span className={`
+                        ${quizpack.status === 'closed' ? 'text-gray-400' : ''}
+                        ${quizpack.status === 'opened' ? 'text-[#FF8400]' : ''}
+                        ${quizpack.status === 'completed' ? 'text-[#FF8400]' : ''}
+                    `}>
+                        {quizpack.status === 'closed' && '열리지 않았어요'}
+                        {quizpack.status === 'opened' && '이제 풀 수 있어요'}
+                        {quizpack.status === 'completed' && quizpack.userCorrectRate !== null && (
+                            `정답률 ${Math.round(quizpack.userCorrectRate)}%`
+                        )}
                     </span>
-                )}
-            </div>
+
+                    {/* 일반 상태 - 우측 별점 (대부분 완료 상태에서만 노출됨) */}
+                    {quizpack.status !== 'closed' && quizpack.status !== 'opened' && quizpack.averageRating !== null && quizpack.averageRating > 0 && (
+                        <div className="flex items-center text-gray-700">
+                            <Star className="w-[14px] h-[14px] mr-1 text-[#FF8400] fill-[#FF8400]" />
+                            {quizpack.averageRating.toFixed(1)}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
+
