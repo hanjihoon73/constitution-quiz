@@ -35,7 +35,7 @@ export function WelcomeDialog({ open, onOpenChange }: WelcomeDialogProps) {
                         <p className="text-[15px] font-medium leading-relaxed text-foreground/90">
                             법은 어렵다고,
                             <br />
-                            나와는 먼 이야기라고 생각하나요?
+                            나와는 먼 이야기라고 생각하시나요?
                         </p>
                         <p className="text-[15px] font-medium leading-relaxed text-foreground/90">
                             하지만 <span className="font-bold text-foreground">헌법</span>은 대한민국 국민이라면

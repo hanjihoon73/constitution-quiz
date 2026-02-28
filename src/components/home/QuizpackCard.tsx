@@ -56,7 +56,7 @@ export function QuizpackCard({ quizpack, onCompletedClick, onOpenedClick, isCurr
             case 'in_progress':
                 return `${base} bg-white border border-[#FF8400] cursor-pointer hover:shadow-lg hover:-translate-y-1`;
             case 'completed':
-                return `${base} bg-white border border-gray-300 cursor-pointer hover:shadow-lg hover:-translate-y-1`;
+                return `${base} bg-gray-100 border border-gray-300 cursor-pointer hover:shadow-lg hover:-translate-y-1`;
             default:
                 return `${base} bg-white border border-gray-200`;
         }

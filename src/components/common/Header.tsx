@@ -42,14 +42,14 @@ export function Header({ showProfile = true }: HeaderProps) {
     };
 
     return (
-        <header className="sticky top-0 z-50 w-full safe-area-top bg-white/100 border-b border-black/5 shadow-sm">
+        <header className="sticky top-0 z-50 w-full safe-area-top bg-[#2d2d2d] border-b border-black/5 shadow-sm">
             <div className="flex h-18 items-center justify-between px-6">
                 {/* BI 로고 */}
                 <Link href="/" className="flex items-center">
                     <Image
-                        src="/bi-constitution-quiz-horizontal.svg"
+                        src="/bi-constitution-quiz-horizontal-white.svg"
                         alt="모두의 헌법"
-                        width={120}
+                        width={100}
                         height={28}
                         priority
                     />
@@ -63,7 +63,7 @@ export function Header({ showProfile = true }: HeaderProps) {
                         className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-transform duration-200 hover:-translate-y-0.5 active:scale-95"
                         aria-label="공유하기"
                     >
-                        <Share className="h-6 w-6 text-gray-700" strokeWidth={2} />
+                        <Share className="h-6 w-6 text-white" strokeWidth={2} />
                     </button>
 
                     {/* 프로필 아이콘 */}
@@ -72,7 +72,7 @@ export function Header({ showProfile = true }: HeaderProps) {
                             href="/profile"
                             className="flex h-10 w-10 items-center justify-center rounded-full transition-transform duration-200 hover:-translate-y-0.5 active:scale-95"
                         >
-                            <CircleUser className="h-7 w-7 text-gray-700" strokeWidth={2} />
+                            <CircleUser className="h-7 w-7 text-white" strokeWidth={2} />
                         </Link>
                     )}
                 </div>

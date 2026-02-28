@@ -172,7 +172,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* 프로필 카드 */}
-                <div className="px-4 pt-6 pb-4">
+                <div className="px-4 pt-6 pb-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
                     <div className="bg-white rounded-2xl border border-gray-200 p-6">
                         {/* 프로필 아이콘 + 닉네임 */}
                         <div className="flex flex-col items-center gap-4">
@@ -251,7 +251,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* 계정 정보 */}
-                <div className="px-4 pb-4">
+                <div className="px-4 pb-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-both">
                     <div className="bg-white rounded-2xl border border-gray-200 p-5">
                         <div className="space-y-4 pt-2">
                             {/* 계정 종류 */}
@@ -272,7 +272,7 @@ export default function ProfilePage() {
 
                             {/* 가입일시 */}
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-500">최초 가입일시</span>
+                                <span className="text-sm text-gray-500">가입 일시</span>
                                 <span className="text-sm font-medium text-gray-800">
                                     {dbUser.created_at ? (() => {
                                         const d = new Date(dbUser.created_at);
@@ -290,7 +290,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* 로그아웃 버튼 */}
-                <div className="px-4 pb-4">
+                <div className="px-4 pb-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
                     <Button
                         onClick={handleLogout}
                         variant="outline"
@@ -302,7 +302,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* 회원탈퇴 */}
-                <div className="px-4 pb-4 flex justify-center">
+                <div className="px-4 pb-4 flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">
                     <button
                         onClick={() => setShowWithdrawDialog(true)}
                         className="text-sm text-gray-400 underline underline-offset-4 hover:text-gray-500 transition-colors"
@@ -312,14 +312,14 @@ export default function ProfilePage() {
                 </div>
 
                 {/* 서비스 문의 */}
-                <div className="px-4 pb-4 flex justify-center mt-2">
+                <div className="px-4 pb-4 flex justify-center mt-2 animate-in fade-in duration-500 delay-700 fill-mode-both">
                     <p className="text-xs text-gray-400">
                         서비스 문의: cognityhelp@gmail.com
                     </p>
                 </div>
 
                 {/* 저작권 문구 */}
-                <div className="px-4 pb-12 flex justify-center mt-auto">
+                <div className="px-4 pb-12 flex justify-center mt-auto animate-in fade-in duration-500 delay-700 fill-mode-both">
                     <p className="text-xs text-gray-400">
                         ⓒ 2025 COGNITY. All rights reserved.
                     </p>
