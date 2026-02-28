@@ -3,7 +3,7 @@
 import { ReactNode } from 'react';
 
 interface MobileFrameProps {
-    children: ReactNode;
+    children?: ReactNode;
     className?: string;
 }
 

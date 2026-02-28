@@ -1,12 +1,27 @@
 'use client';
 
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/components/auth';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { MobileFrame } from '@/components/common';
 
 export default function LoginPage() {
+    const { user, isLoading } = useAuth();
     const supabase = createClient();
+
+    const [isFadingOut, setIsFadingOut] = useState(false);
+
+    // 사용자가 이미 로그인되어 있다면 페이드아웃 후 홈으로 이동
+    useEffect(() => {
+        if (!isLoading && user) {
+            setIsFadingOut(true);
+            setTimeout(() => {
+                window.location.replace('/');
+            }, 350);
+        }
+    }, [user, isLoading]);
 
     const handleGoogleLogin = async () => {
         await supabase.auth.signInWithOAuth({
@@ -25,6 +40,26 @@ export default function LoginPage() {
             },
         });
     };
+
+    // 인증 확인 중 or 이미 로그인 → 로고 스플래시 화면 (로고만 페이드인/아웃)
+    if (isLoading || user) {
+        return (
+            <MobileFrame className="bg-background text-foreground">
+                <div className="flex flex-1 flex-col items-center justify-center min-h-full">
+                    <div className={`transition-opacity duration-300 ${isFadingOut ? 'opacity-0' : 'animate-in fade-in duration-300'
+                        }`}>
+                        <Image
+                            src="/bi-constitution-quiz-vertical.svg"
+                            alt="모두의 헌법"
+                            width={180}
+                            height={120}
+                            priority
+                        />
+                    </div>
+                </div>
+            </MobileFrame>
+        );
+    }
 
     return (
         <MobileFrame className="bg-background text-foreground animate-in fade-in duration-500">

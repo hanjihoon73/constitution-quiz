@@ -25,6 +25,7 @@ export default function ProfilePage() {
     const [isValid, setIsValid] = useState(false);
     const [isChecking, setIsChecking] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
 
     // 로그인 안 되어 있으면 로그인 페이지로
@@ -134,8 +135,15 @@ export default function ProfilePage() {
 
     // 로그아웃
     const handleLogout = async () => {
-        await signOut();
-        router.push('/login');
+        setIsLoggingOut(true);
+        try {
+            await signOut();
+            window.location.replace('/login');
+        } catch (error) {
+            console.error('로그아웃 에러:', error);
+            toast.error('로그아웃에 실패했습니다.');
+            setIsLoggingOut(false);
+        }
     };
 
     const getProviderLabel = (provider: string) => {
@@ -294,11 +302,12 @@ export default function ProfilePage() {
                 <div className="px-4 pb-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
                     <Button
                         onClick={handleLogout}
+                        disabled={isLoggingOut}
                         variant="outline"
                         className="w-full h-12 rounded-xl text-gray-600 border-gray-200 hover:bg-gray-50 font-medium text-sm gap-2"
                     >
                         <LogOut size={18} />
-                        로그아웃
+                        {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
                     </Button>
                 </div>
 

@@ -35,7 +35,7 @@ export default function Home() {
 function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, dbUser, isLoading: authLoading } = useAuth();
+  const { user, dbUser, isLoading: authLoading, isDbUserLoaded } = useAuth();
   const { quizpacks, isLoading: quizpacksLoading, error } = useQuizpacks();
 
   const [showAllClearDialog, setShowAllClearDialog] = useState(false);
@@ -54,11 +54,12 @@ function HomeContent() {
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
   // 신규 사용자는 온보딩으로 자동 리다이렉트
+  // isDbUserLoaded가 true가 된 후에만 판단 (로딩 중 오진 방지)
   useEffect(() => {
-    if (!authLoading && user && !dbUser) {
-      router.push('/onboarding');
+    if (!authLoading && isDbUserLoaded && user && !dbUser) {
+      window.location.replace('/onboarding');
     }
-  }, [authLoading, user, dbUser, router]);
+  }, [authLoading, isDbUserLoaded, user, dbUser]);
 
   // All Clear 파라미터 확인
   useEffect(() => {
@@ -232,7 +233,7 @@ function HomeContent() {
   };
 
   return (
-    <MobileFrame>
+    <MobileFrame className="animate-in fade-in duration-500">
       <Header />
 
       {/* 퀴즈팩 목록 (전체 화면 스크롤) */}

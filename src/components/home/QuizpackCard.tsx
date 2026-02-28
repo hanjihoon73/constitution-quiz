@@ -100,7 +100,7 @@ export function QuizpackCard({ quizpack, onCompletedClick, onOpenedClick, isCurr
                     const tagTheme = isClosed
                         ? 'bg-[#E5E7EB] text-[#9CA3AF]'
                         : quizpack.status === 'completed'
-                            ? 'bg-[#2D2D2D] text-gray-300'
+                            ? 'bg-[#2D2D2D] text-white'
                             : 'bg-[#2D2D2D] text-[#FF8400]';
 
                     return (
@@ -143,7 +143,7 @@ export function QuizpackCard({ quizpack, onCompletedClick, onOpenedClick, isCurr
                     </div>
                 </div>
             ) : (
-                <div className="flex justify-between items-center text-[13px] font-medium">
+                <div className="flex justify-between items-center text-[13px] font-medium min-h-[20px]">
                     {/* 일반 상태 (닫힘/열림/완료) - 좌측 메시지 */}
                     <span className={`
                         ${quizpack.status === 'closed' ? 'text-gray-400' : ''}
@@ -158,10 +158,10 @@ export function QuizpackCard({ quizpack, onCompletedClick, onOpenedClick, isCurr
                     </span>
 
                     {/* 일반 상태 - 우측 별점 (대부분 완료 상태에서만 노출됨) */}
-                    {quizpack.status !== 'closed' && quizpack.status !== 'opened' && quizpack.averageRating !== null && quizpack.averageRating > 0 && (
+                    {quizpack.status !== 'closed' && quizpack.status !== 'opened' && quizpack.averageRating !== null && Number(quizpack.averageRating) > 0 && (
                         <div className="flex items-center text-gray-700">
                             <Star className="w-[14px] h-[14px] mr-1 text-[#FF8400] fill-[#FF8400]" />
-                            {quizpack.averageRating.toFixed(1)}
+                            {Number(quizpack.averageRating).toFixed(1)}
                         </div>
                     )}
                 </div>

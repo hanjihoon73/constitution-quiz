@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     useEffect(() => {
-        // 초기 세션 확인
+        // 초기 세션 확인 (최초 1회만 실행되어 isLoading 해제 담당)
         const initializeAuth = async () => {
             const { data: { session } } = await supabase.auth.getSession();
 
@@ -81,6 +81,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (session?.user) {
                 await fetchDbUser(session.user);
+            } else {
+                // 세션 없으면 isDbUserLoaded도 완료로 설정 (비로그인 상태)
+                setIsDbUserLoaded(true);
             }
 
             isInitialized.current = true;
@@ -89,11 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         initializeAuth();
 
-        // 인증 상태 변경 리스너
+        // 인증 상태 변경 리스너 (초기화 완료 이후 변경사항만 처리)
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
-                // 초기화 완료 전 INITIAL_SESSION 이벤트는 무시 (initializeAuth에서 처리)
-                if (!isInitialized.current && event === 'INITIAL_SESSION') {
+                // INITIAL_SESSION은 initializeAuth에서 처리하므로 무시
+                if (!isInitialized.current) {
                     return;
                 }
 
@@ -106,8 +109,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     setDbUser(null);
                     setIsDbUserLoaded(false);
                 }
-
-                setIsLoading(false);
             }
         );
 
