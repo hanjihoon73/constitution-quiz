@@ -11,7 +11,7 @@ interface QuizContentProps {
     selectedIds: number[];
     blankAnswers: Map<number, number>;
     onSelectChoice: (choiceId: number) => void;
-    onSetBlank: (position: number, choiceId: number) => void;
+    onSetBlank: (position: number, choiceId: number | null) => void;
     isChecked: boolean;
     isCorrect?: boolean;
     showHint: boolean;

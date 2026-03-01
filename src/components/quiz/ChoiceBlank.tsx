@@ -9,17 +9,17 @@ interface ChoiceBlankProps {
     choices: QuizChoice[];
     blankCount: number;
     blankAnswers: Map<number, number>;
-    onSetBlank: (position: number, choiceId: number) => void;
+    onSetBlank: (position: number, choiceId: number | null) => void;
     isChecked: boolean;
 }
 
-// 색상 상수
+// 색상 상수 (빈칸 & 보기 버튼 공통)
 const COLOR = {
-    correct: { bg: '#EFF6FF', border: '#3B82F6', text: '#2563EB' },
-    wrong: { bg: '#FEF2F2', border: '#EF4444', text: '#DC2626' },
-    selected: { bg: '#3B82F6', border: '#3B82F6', text: '#ffffff' }, // 빈칸이 채워졌을 때
-    active: { bg: '#EFF6FF', border: '#3B82F6', text: '#2563EB' }, // 빈칸을 클릭해서 활성화했을 때
-    default: { bg: '#ffffff', border: '#3B82F6', text: '#3B82F6' }, // 기본 빈칸
+    correct: { bg: '#DAF5FF', border: '#38D2E3', text: '#2D2D2D' }, // 정답 시안색
+    wrong: { bg: '#FEE6F3', border: '#FB84C5', text: '#2D2D2D' },   // 오답 핑크색
+    selected: { bg: '#FFEEDB', border: '#FF8400', text: '#2D2D2D' }, // 빈칸에 보기가 채워졌을 때
+    active: { bg: '#ffffff', border: '#FF8400', text: '#FF8400' },   // 클릭 활성화
+    default: { bg: '#ffffff', border: '#D2D2D2', text: '#2D2D2D' }, // 기본 비활성/빈칸
 };
 
 /**
@@ -63,7 +63,8 @@ export function ChoiceBlank({
     // 빈칸 초기화
     const handleClearBlank = (position: number) => {
         if (isChecked) return;
-        setActiveBlank(position);
+        onSetBlank(position, null); // 1. 빈칸에서 보기 제거
+        setActiveBlank(null);       // 2. 다른 빈칸이나 보기가 선택되지 않은 기본 상태로 초기화
     };
 
     // 지문에서 빈칸 패턴을 찾아서 렌더링
@@ -100,19 +101,15 @@ export function ChoiceBlank({
 
             // 스타일 결정
             let colors = COLOR.default;
-            let resultIcon: 'correct' | 'wrong' | null = null;
 
             if (isChecked && filledChoice) {
                 const isCorrectAnswer = filledChoiceId === correctChoice?.id;
                 colors = isCorrectAnswer ? COLOR.correct : COLOR.wrong;
-                resultIcon = isCorrectAnswer ? 'correct' : 'wrong';
             } else if (filledChoice) {
-                colors = COLOR.selected;
+                colors = COLOR.selected; // 배경: #FFEEDB, 텍스트: #2D2D2D, 테두리: #FF8400
             } else if (isActive) {
                 colors = COLOR.active;
             }
-
-            const circledNumbers = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
 
             return (
                 <button
@@ -121,28 +118,28 @@ export function ChoiceBlank({
                         ? handleClearBlank(position)
                         : handleBlankClick(position)}
                     disabled={isChecked}
-                    className="quiz-hover"
                     style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        minWidth: '80px',
-                        padding: '6px 14px',
-                        margin: '0 4px',
+                        display: 'inline-block',
+                        height: '38px',
+                        lineHeight: '36px', // 테두리 1px*2 패딩 보정
+                        minWidth: '72px',
+                        padding: '0 16px',
+                        margin: '0 6px',
                         backgroundColor: colors.bg,
-                        border: `2px ${isActive || filledChoice ? 'solid' : 'dashed'} ${colors.border}`,
-                        borderRadius: '12px',
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: '8px',
                         cursor: isChecked ? 'default' : 'pointer',
                         fontSize: '15px',
                         fontWeight: 'bold',
                         color: colors.text,
                         transition: 'all 0.2s ease',
+                        verticalAlign: 'bottom', // 텍스트 줄 기준
+                        position: 'relative',
+                        top: '-2px', // 시각적 중앙 정렬 미세 조정
+                        textAlign: 'center',
                     }}
                 >
-                    {filledChoice ? filledChoice.choiceText : circledNumbers[position - 1] || `(${position})`}
-                    {resultIcon === 'correct' && <Check size={16} color="#3B82F6" strokeWidth={3} />}
-                    {resultIcon === 'wrong' && <X size={16} color="#EF4444" strokeWidth={3} />}
+                    {filledChoice ? filledChoice.choiceText : `빈칸${position}`}
                 </button>
             );
         });
@@ -153,41 +150,23 @@ export function ChoiceBlank({
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {/* 안내 메시지 */}
-            {!isChecked && (
-                <div
-                    style={{
-                        padding: '12px 16px',
-                        backgroundColor: activeBlank ? '#EFF6FF' : selectedChoice ? '#EFF6FF' : '#F3F4F6',
-                        borderRadius: '12px',
-                        fontSize: '14px',
-                        color: activeBlank ? '#2563EB' : selectedChoice ? '#2563EB' : '#6B7280',
-                        textAlign: 'center',
-                        fontWeight: '500',
-                    }}
-                >
-                    {activeBlank
-                        ? `${activeBlank}번 빈칸이 선택되었습니다. 아래에서 보기를 선택하세요.`
-                        : selectedChoice
-                            ? '위에서 빈칸을 클릭하여 답을 채우세요.'
-                            : '빈칸 또는 보기를 클릭하세요.'}
-                </div>
-            )}
+            {/* 상단 안내 메시지 영역(기존 activeBlank 체크 영역)은 시안과 다르므로 완전히 걷어냈습니다. */}
 
             {/* 지문 (빈칸 포함) */}
             <div
                 style={{
-                    backgroundColor: '#f9fafb',
-                    padding: '20px',
-                    borderRadius: '12px',
-                    lineHeight: '2.2',
-                    fontSize: '15px',
+                    backgroundColor: '#F3F4F6',
+                    padding: '24px',
+                    borderRadius: '16px',
+                    lineHeight: '2.8', // 다시 넓은 행간으로 유지하되 버튼은 늘어나지 않음
+                    fontSize: '16px',
+                    color: '#374151',
                 }}
             >
                 {renderPassageWithBlanks()}
             </div>
 
-            {/* 보기 목록 */}
+            {/* 보기 목록 컨테이너 */}
             <div>
                 <p style={{
                     fontSize: '13px',
@@ -200,37 +179,55 @@ export function ChoiceBlank({
                 <div style={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: '10px'
+                    gap: '12px'
                 }}>
                     {choices.map((choice) => {
                         const isUsed = usedChoiceIds.includes(choice.id);
                         const isSelectedNow = selectedChoice === choice.id;
 
+                        // 보기 버튼 전용 배경/텍스트/보더 오버라이드
+                        let btnBg = '#ffffff';
+                        let btnBorder = '#D2D2D2';
+                        let btnText = '#2D2D2D'; // 미선택 보기의 폰트 색상을 #2D2D2D로 수정
+                        let btnOpacity = 1;
+
+                        if (isChecked) {
+                            if (choice.isCorrect) {
+                                btnBg = COLOR.correct.bg;
+                                btnBorder = COLOR.correct.border;
+                                btnText = COLOR.correct.text;
+                            } else {
+                                btnBg = COLOR.default.bg;
+                                btnBorder = COLOR.default.border;
+                                btnText = COLOR.default.text;
+                            }
+                        } else if (isUsed) {
+                            // 지문에 넣은(사용된) 보기 상태
+                            btnBg = '#F3F4F6';     // 연한 회색 배경
+                            btnBorder = '#D2D2D2'; // 연한 회색 테두리
+                            btnText = '#9CA3AF';   // 폰트 연한 회색 (본문은 짙은회색, 아래 보기는 연한회색)
+                            btnOpacity = 1;        // 색상으로 구분되므로 투명도는 주지 않음
+                        } else if (isSelectedNow) {
+                            btnBg = COLOR.active.bg;
+                            btnBorder = COLOR.active.border;
+                            btnText = COLOR.active.text;
+                        }
+
                         return (
                             <button
                                 key={choice.id}
                                 onClick={() => handleChoiceClick(choice.id)}
-                                disabled={isChecked || isUsed}
-                                className={isChecked || isUsed ? '' : 'quiz-hover'}
+                                disabled={isChecked} // isUsed 여도 다시 클릭해서 취소하거나 다른 빈칸에 넣을 수 있게 허용 (기획에 따라 다를 수 있음)
                                 style={{
-                                    padding: '12px 20px',
-                                    backgroundColor: isSelectedNow
-                                        ? '#EFF6FF'
-                                        : isUsed
-                                            ? '#ffffff'
-                                            : '#F3F4F6',
-                                    color: isSelectedNow
-                                        ? '#2563EB'
-                                        : isUsed
-                                            ? '#9CA3AF'
-                                            : '#374151',
-                                    border: `2px solid ${isSelectedNow ? '#3B82F6' : isUsed ? '#E5E7EB' : 'transparent'}`,
-                                    borderRadius: '9999px', // 캡슐 모양
-                                    cursor: isChecked || isUsed ? 'default' : 'pointer',
+                                    padding: '8px 16px',
+                                    backgroundColor: btnBg,
+                                    color: btnText,
+                                    border: `1px solid ${btnBorder}`,
+                                    borderRadius: '8px', // 살짝 둥근 사각형
+                                    cursor: isChecked ? 'default' : 'pointer',
                                     fontSize: '15px',
                                     fontWeight: '500',
-                                    textDecoration: isUsed ? 'line-through' : 'none',
-                                    opacity: isUsed ? 0.6 : 1,
+                                    opacity: btnOpacity,
                                     transition: 'all 0.2s ease',
                                 }}
                             >

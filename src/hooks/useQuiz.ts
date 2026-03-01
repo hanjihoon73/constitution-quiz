@@ -30,7 +30,7 @@ interface UseQuizReturn extends UseQuizState {
     currentQuiz: Quiz | null;
     progress: { current: number; total: number };
     selectChoice: (choiceId: number) => void;
-    setBlankAnswer: (position: number, choiceId: number) => void;
+    setBlankAnswer: (position: number, choiceId: number | null) => void;
     checkAnswer: () => boolean;
     goToNext: () => void;
     goToPrev: () => void;
@@ -249,7 +249,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
     }, [state.isChecked, currentQuiz]);
 
     // 빈칸 답안 설정 (빈칸채우기용)
-    const setBlankAnswer = useCallback((position: number, choiceId: number) => {
+    const setBlankAnswer = useCallback((position: number, choiceId: number | null) => {
         if (state.isChecked || !currentQuiz) return;
 
         setState(prev => {
@@ -257,7 +257,11 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
             const existing = newAnswers.get(currentQuiz.id);
             const blankAnswers = new Map(existing?.blankAnswers || []);
 
-            blankAnswers.set(position, choiceId);
+            if (choiceId === null) {
+                blankAnswers.delete(position);
+            } else {
+                blankAnswers.set(position, choiceId);
+            }
 
             newAnswers.set(currentQuiz.id, {
                 quizId: currentQuiz.id,
