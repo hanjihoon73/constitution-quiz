@@ -48,12 +48,12 @@ export function QuizNavigation({ total, current, answers, quizIds, onNavigate }:
                     let borderColor = '#D2D2D2';
                     let textColor = '#D2D2D2';
 
-                    if (isCurrent && !answer) {
-                        // 현재 진행 중 (미해결): 다크 그레이 배경, 오렌지 번호 텍스트
+                    if (isCurrent && (!answer || answer.isCorrect === undefined)) {
+                        // 현재 진행 중 (미해결 또는 채점 전): 다크 그레이 배경, 오렌지 번호 텍스트
                         bgColor = '#2D2D2D';
                         borderColor = '#2D2D2D';
                         textColor = '#FF8400';
-                    } else if (answer) {
+                    } else if (answer && answer.isCorrect !== undefined) {
                         if (answer.isCorrect) {
                             // 정답: 시안색 배경, #2D2D2D 텍스트
                             bgColor = '#38D2E3';
