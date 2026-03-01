@@ -160,7 +160,10 @@ export function QuizContent({
                                 fontSize: '14px',
                                 fontWeight: 'bold',
                                 color: '#9CA3AF',
+                                transition: 'transform 0.2s ease', // 효과를 위한 transition 추가
                             }}
+                            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+                            onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
                         >
                             <Lightbulb size={16} color="#FF8400" />
                             <span>힌트</span>

@@ -77,7 +77,6 @@ export function QuizLayout({ children, navigation, onExit }: QuizLayoutProps) {
                 >
                     <button
                         onClick={handleExitClick}
-                        className="quiz-hover"
                         style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -89,7 +88,10 @@ export function QuizLayout({ children, navigation, onExit }: QuizLayoutProps) {
                             cursor: 'pointer',
                             color: '#6B7280',
                             fontSize: '20px',
+                            transition: 'transform 0.2s ease', // 효과를 위한 transition 추가
                         }}
+                        onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
                         aria-label="나가기"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
