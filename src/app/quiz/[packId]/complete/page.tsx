@@ -291,21 +291,21 @@ export default function QuizCompletePage() {
             }}>
                 {/* 총 문제 */}
                 <div style={{ textAlign: 'center', flex: 1, borderRight: '1px solid #E5E7EB' }}>
-                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#2D2D2D', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#2D2D2D', marginBottom: '4px' }}>
                         {result?.totalQuizCount || 0}
                     </div>
                     <div style={{ fontSize: '13px', color: '#9CA3AF' }}>퀴즈</div>
                 </div>
                 {/* 정답 */}
                 <div style={{ textAlign: 'center', flex: 1, borderRight: '1px solid #E5E7EB' }}>
-                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#38D2E3', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#38D2E3', marginBottom: '4px' }}>
                         {result?.correctCount || 0}
                     </div>
                     <div style={{ fontSize: '13px', color: '#9CA3AF' }}>정답</div>
                 </div>
                 {/* 오답 */}
                 <div style={{ textAlign: 'center', flex: 1 }}>
-                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#FB84C5', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#FB84C5', marginBottom: '4px' }}>
                         {result?.incorrectCount || 0}
                     </div>
                     <div style={{ fontSize: '13px', color: '#9CA3AF' }}>오답</div>
@@ -373,7 +373,7 @@ export default function QuizCompletePage() {
                         color: 'white',
                         border: 'none',
                         borderRadius: '12px',
-                        fontSize: '15px',
+                        fontSize: '16px',
                         fontWeight: 'bold',
                         cursor: isSaving ? 'not-allowed' : 'pointer',
                     }}
@@ -394,7 +394,7 @@ export default function QuizCompletePage() {
                             color: '#4B5563',
                             border: 'none',
                             borderRadius: '12px',
-                            fontSize: '15px',
+                            fontSize: '16px',
                             fontWeight: 'bold',
                             cursor: isSaving ? 'not-allowed' : 'pointer',
                         }}
@@ -412,7 +412,7 @@ export default function QuizCompletePage() {
                             color: '#FF8400',
                             border: 'none',
                             borderRadius: '12px',
-                            fontSize: '15px',
+                            fontSize: '16px',
                             fontWeight: 'bold',
                             cursor: isSaving ? 'not-allowed' : 'pointer',
                         }}
