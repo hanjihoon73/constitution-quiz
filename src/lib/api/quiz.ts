@@ -397,7 +397,7 @@ export async function updateQuizpackStatistics(
 }
 
 /**
- * 사용자의 퀴즈팩 평점을 저장합니다.
+ * 사용자의 퀴즈팩 별점을 저장합니다. (히스토리 방식 - 항상 INSERT)
  */
 export async function saveQuizpackRating(
     userId: number,
@@ -406,42 +406,21 @@ export async function saveQuizpackRating(
 ) {
     const supabase = createClient();
 
-    // 기존 평점 조회
-    const { data: existing } = await supabase
+    // 히스토리 방식: 항상 새 레코드 INSERT (풀이 횟수만큼 레코드 누적)
+    const { error } = await supabase
         .from('user_quizpack_ratings')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('quizpack_id', packId)
-        .maybeSingle();
+        .insert({
+            user_id: userId,
+            quizpack_id: packId,
+            rating,
+        });
 
-    if (existing) {
-        // 기존 평점 업데이트
-        const { error } = await supabase
-            .from('user_quizpack_ratings')
-            .update({ rating })
-            .eq('id', existing.id);
-
-        if (error) {
-            console.error('평점 업데이트 에러:', error);
-            throw error;
-        }
-    } else {
-        // 새 평점 생성
-        const { error } = await supabase
-            .from('user_quizpack_ratings')
-            .insert({
-                user_id: userId,
-                quizpack_id: packId,
-                rating,
-            });
-
-        if (error) {
-            console.error('평점 생성 에러:', error);
-            throw error;
-        }
+    if (error) {
+        console.error('별점 저장 에러:', error);
+        throw error;
     }
 
-    // quizpack_statistics의 평점 집계 업데이트
+    // quizpack_statistics의 평점 집계 업데이트 (전체 히스토리 기반 평균)
     await updateQuizpackAverageRating(packId);
 }
 
