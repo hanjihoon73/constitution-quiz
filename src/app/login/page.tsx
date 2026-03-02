@@ -94,7 +94,7 @@ export default function LoginPage() {
                         <Button
                             onClick={handleGoogleLogin}
                             variant="outline"
-                            className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border-border !bg-white hover:bg-accent/50 text-card-foreground font-medium shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5"
+                            className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border-border !bg-white hover:bg-accent/50 text-card-foreground font-medium shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
                         >
                             <svg className="size-6" viewBox="0 0 24 24">
                                 <path
@@ -120,7 +120,7 @@ export default function LoginPage() {
                         {/* Kakao 로그인 */}
                         <Button
                             onClick={handleKakaoLogin}
-                            className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#d9c307] font-medium shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 opacity-100 hover:opacity-90"
+                            className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#d9c307] font-medium shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 opacity-100 hover:opacity-90 cursor-pointer"
                             style={{ backgroundColor: '#FEE500', color: '#000000' }}
                         >
                             <svg className="size-6" viewBox="0 0 24 24">

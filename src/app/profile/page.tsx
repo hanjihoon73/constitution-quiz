@@ -174,7 +174,7 @@ export default function ProfilePage() {
                 <div className="px-4 pt-4">
                     <button
                         onClick={() => router.back()}
-                        className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-transform duration-200 hover:-translate-y-0.5 active:scale-95 hover:text-gray-700"
+                        className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-transform duration-200 hover:-translate-y-0.5 active:scale-95 hover:text-gray-700 cursor-pointer"
                     >
                         <ArrowLeft size={24} />
                     </button>
@@ -304,9 +304,8 @@ export default function ProfilePage() {
                         onClick={handleLogout}
                         disabled={isLoggingOut}
                         variant="outline"
-                        className="w-full h-12 rounded-xl text-gray-600 border-gray-200 hover:bg-gray-50 font-medium text-sm gap-2"
+                        className="w-full h-12 rounded-xl text-gray-600 border-gray-200 hover:bg-gray-50 font-medium text-sm transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
                     >
-                        <LogOut size={18} />
                         {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
                     </Button>
                 </div>
@@ -315,7 +314,7 @@ export default function ProfilePage() {
                 <div className="px-4 pb-4 flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">
                     <button
                         onClick={() => setShowWithdrawDialog(true)}
-                        className="text-sm text-gray-400 underline underline-offset-4 hover:text-gray-500 transition-colors"
+                        className="text-sm text-gray-400 underline underline-offset-4 hover:text-gray-500 transition-colors cursor-pointer"
                     >
                         회원탈퇴
                     </button>
@@ -326,6 +325,18 @@ export default function ProfilePage() {
                     <p className="text-xs text-gray-400">
                         서비스 문의: cognityhelp@gmail.com
                     </p>
+                </div>
+
+                {/* 이용약관 및 개인정보처리방침 */}
+                <div className="px-4 pb-4 flex justify-center animate-in fade-in duration-500 delay-700 fill-mode-both">
+                    <a
+                        href="https://maperson.notion.site/2d2e387af28e804c94cecdf08c322ef6?source=copy_link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-muted-foreground/60 underline hover:text-foreground cursor-pointer transition-colors"
+                    >
+                        이용약관 및 개인정보처리방침
+                    </a>
                 </div>
 
                 {/* 저작권 문구 */}
