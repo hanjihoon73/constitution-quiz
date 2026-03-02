@@ -174,7 +174,7 @@ export default function QuizCompletePage() {
             </div>
 
             {/* 상단 축하 메시지 */}
-            <div style={{
+            <div className="animate-fade-in-up delay-100" style={{
                 padding: '20px 20px 10px',
                 textAlign: 'center',
                 display: 'flex',
@@ -201,7 +201,7 @@ export default function QuizCompletePage() {
             </div>
 
             {/* 정답률 원형 & 결과보기 버튼 */}
-            <div style={{
+            <div className="animate-fade-in-up delay-200" style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -278,7 +278,7 @@ export default function QuizCompletePage() {
             </div>
 
             {/* 결과 요약 카드 */}
-            <div style={{
+            <div className="animate-fade-in-up delay-300" style={{
                 margin: '0 20px',
                 backgroundColor: 'white',
                 border: '1px solid #E5E7EB',
@@ -313,7 +313,7 @@ export default function QuizCompletePage() {
             </div>
 
             {/* 선호도 입력 (별점) */}
-            <div style={{
+            <div className="animate-fade-in-up delay-500" style={{
                 margin: '16px 20px 24px',
                 padding: '24px',
                 backgroundColor: 'white',
@@ -355,7 +355,8 @@ export default function QuizCompletePage() {
             </div>
 
             {/* 버튼 영역 */}
-            <div style={{
+            <div className="animate-fade-in-up" style={{
+                animationDelay: '600ms',
                 padding: '0 20px',
                 display: 'flex',
                 flexDirection: 'column',
