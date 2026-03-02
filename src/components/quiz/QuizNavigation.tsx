@@ -31,7 +31,7 @@ export function QuizNavigation({ total, current, answers, quizIds, onNavigate }:
                     gap: '8px',
                     padding: '8px 24px',
                     overflowX: 'auto',
-                    border: '1px solid #D2D2D2',
+                    border: '1px solid #E5E7EB',
                     borderRadius: '9999px',
                     scrollbarWidth: 'none', // Firefox
                     msOverflowStyle: 'none', // IE and Edge
@@ -45,22 +45,36 @@ export function QuizNavigation({ total, current, answers, quizIds, onNavigate }:
 
                     // 기본 상태: 투명 배경, 연한 회색 테두리, 회색 번호 텍스트
                     let bgColor = 'transparent';
-                    let borderColor = '#D2D2D2';
+                    let borderColor = '#E5E7EB';
                     let textColor = '#D2D2D2';
 
-                    if (isCurrent && (!answer || answer.isCorrect === undefined)) {
-                        // 현재 진행 중 (미해결 또는 채점 전): 다크 그레이 배경, 오렌지 번호 텍스트
-                        bgColor = '#2D2D2D';
-                        borderColor = '#2D2D2D';
-                        textColor = '#FF8400';
-                    } else if (answer && answer.isCorrect !== undefined) {
+                    const isAnswered = answer && answer.isCorrect !== undefined;
+
+                    if (isCurrent) {
+                        if (!isAnswered) {
+                            // 상태 A: 현재 퀴즈 - 정오답 결과 전
+                            bgColor = '#2D2D2D';
+                            borderColor = '#2D2D2D';
+                            textColor = '#FF8400';
+                        } else if (answer.isCorrect) {
+                            // 상태 B: 현재 퀴즈 - 정답 결과
+                            bgColor = '#2D2D2D';
+                            borderColor = '#2D2D2D';
+                            textColor = '#38D2E3';
+                        } else {
+                            // 상태 C: 현재 퀴즈 - 오답 결과
+                            bgColor = '#2D2D2D';
+                            borderColor = '#2D2D2D';
+                            textColor = '#FB84C5';
+                        }
+                    } else if (isAnswered) {
                         if (answer.isCorrect) {
-                            // 정답: 시안색 배경, #2D2D2D 텍스트
+                            // 상태 D: 현재 퀴즈 아님 - 정답 결과
                             bgColor = '#38D2E3';
                             borderColor = '#38D2E3';
                             textColor = '#2D2D2D';
                         } else {
-                            // 오답: 핑크색 배경, #2D2D2D 텍스트
+                            // 상태 E: 현재 퀴즈 아님 - 오답 결과
                             bgColor = '#FB84C5';
                             borderColor = '#FB84C5';
                             textColor = '#2D2D2D';
