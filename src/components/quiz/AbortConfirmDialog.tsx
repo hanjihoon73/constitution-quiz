@@ -48,7 +48,7 @@ export function AbortConfirmDialog({
                 <div className="flex flex-col gap-3 mt-6">
                     <Button
                         type="button"
-                        className="w-full h-[52px] bg-[#2D2D2D] hover:bg-[#1a1a1a] text-[#FF8400] font-medium text-[16px] rounded-[14px] transition-all hover:-translate-y-0.5 hover:shadow-md"
+                        className="w-full h-[52px] bg-[#2D2D2D] hover:bg-[#1a1a1a] text-[#FF8400] font-medium text-[16px] rounded-[14px] transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95"
                         onClick={onConfirm}
                     >
                         새로운 퀴즈팩 시작
@@ -56,7 +56,7 @@ export function AbortConfirmDialog({
                     <Button
                         type="button"
                         variant="ghost"
-                        className="w-full h-[52px] bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#888888] font-medium text-[16px] rounded-[14px] border border-[#E5E7EB] transition-all hover:-translate-y-0.5 hover:shadow-md"
+                        className="w-full h-[52px] bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#888888] font-medium text-[16px] rounded-[14px] border border-[#E5E7EB] transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95"
                         onClick={onCancel}
                     >
                         취소

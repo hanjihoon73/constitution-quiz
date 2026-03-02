@@ -40,7 +40,7 @@ export function ExitConfirmDialog({
                     <Button
                         type="button"
                         disabled={isLoggingOut}
-                        className="w-full h-12 rounded-xl font-semibold bg-[#2D2D2D] text-[#FF8400] border-none shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 focus-visible:ring-0 focus-visible:ring-offset-0"
+                        className="w-full h-12 rounded-xl font-semibold bg-[#2D2D2D] text-[#FF8400] border-none shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 focus-visible:ring-0 focus-visible:ring-offset-0 active:scale-95"
                         onClick={onConfirm}
                     >
                         {isLoggingOut ? '종료 중...' : '네'}

@@ -274,7 +274,7 @@ export default function OnboardingPage() {
                             onClick={handleSubmit}
                             disabled={!isValid || isSubmitting}
                             className={`h-12 w-full rounded-xl font-semibold transition-all duration-200 ${isValid && !isSubmitting
-                                ? 'bg-[#2D2D2D] text-[#FF8400] shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer'
+                                ? 'bg-[#2D2D2D] text-[#FF8400] shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer active:scale-[0.98]'
                                 : 'bg-muted-foreground/30 text-white cursor-not-allowed'
                                 }`}
                         >

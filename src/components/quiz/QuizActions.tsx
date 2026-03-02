@@ -39,6 +39,7 @@ export function QuizActions({
                 <button
                     onClick={onCheckAnswer}
                     disabled={!hasAnswer}
+                    className={hasAnswer ? "active:scale-[0.98] transition-transform" : ""}
                     style={{
                         flex: 1,
                         padding: '16px',
@@ -62,7 +63,7 @@ export function QuizActions({
                             ? (isViewMode && onGoHome ? onGoHome : onComplete)
                             : onNext
                     }
-                    className="quiz-hover"
+                    className={`quiz-hover active:scale-[0.98] transition-transform`}
                     style={{
                         flex: 1,
                         padding: '16px',

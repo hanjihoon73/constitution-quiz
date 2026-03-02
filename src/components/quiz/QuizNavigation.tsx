@@ -87,6 +87,7 @@ export function QuizNavigation({ total, current, answers, quizIds, onNavigate }:
                         <button
                             key={id}
                             onClick={() => onNavigate(index)}
+                            className="active:scale-95 transition-transform"
                             style={{
                                 minWidth: '32px',
                                 height: '32px',

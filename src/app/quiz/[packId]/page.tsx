@@ -106,6 +106,7 @@ export default function QuizPage() {
                     </p>
                     <button
                         onClick={() => router.push('/')}
+                        className="transition-transform active:scale-95"
                         style={{
                             padding: '12px 24px',
                             backgroundColor: '#f59e0b',

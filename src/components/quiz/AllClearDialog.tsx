@@ -28,40 +28,41 @@ export function AllClearDialog({ open, onOpenChange }: AllClearDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
-                className="sm:max-w-md bg-white rounded-2xl border-none shadow-xl"
-                showCloseButton={false}
+                className="sm:max-w-md bg-white rounded-3xl border-none shadow-xl px-8 py-12 max-w-[340px]"
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                showCloseButton={true}
             >
-                <DialogHeader className="flex flex-col items-center gap-6 text-center pt-8">
-                    {/* 트로피 아이콘 */}
-                    <div className="relative">
-                        <div className="text-8xl drop-shadow-md filter">🏆</div>
+                <DialogHeader className="flex flex-col items-center gap-1 text-center">
+                    <div className="flex justify-center mb-4">
+                        <img src="/bi-constitution-quiz-horizontal.svg" alt="모두의 헌법" className="w-[160px] h-auto" />
                     </div>
-
-                    <DialogTitle className="text-2xl font-bold text-gray-900 mt-2">
-                        축하합니다!
+                    <DialogTitle className="text-[20px] font-bold text-[#111111] mb-4">
+                        진심으로 축하합니다!
                     </DialogTitle>
-
-                    <div className="text-base text-gray-600 leading-relaxed space-y-2">
+                    <div className="text-[#888888] text-[15px] font-medium leading-relaxed text-center space-y-5">
                         <p>
-                            대한민국의 헌법을 마스터한 <span className="font-bold text-[#f59e0b]">{nickname}</span>님을<br />
-                            <span className="font-bold text-gray-900">대법관으로 임명합니다.</span>
+                            모두의 헌법을 완료하신 {nickname}님을<br />
+                            <span className="font-bold text-[#888888]">대법관으로 임명합니다.</span>
                         </p>
-                        <p className="text-sm text-gray-500 pt-2">
+                        <p>
                             앞으로도 우리나라의 헌법 수호를 위해<br />
                             최선을 다해주세요.
                         </p>
                     </div>
                 </DialogHeader>
 
-                <DialogFooter className="sm:justify-center p-6 pt-2">
+                <div className="flex flex-col gap-3 mt-8">
+                    <p className="text-[#888888] text-[12px] text-center mb-1">
+                        ※ 새로운 퀴즈팩이 업데이트 되면 공지사항으로 알려드립니다.
+                    </p>
                     <Button
                         type="button"
-                        className="w-full bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold py-3 text-lg rounded-xl shadow-md transition-all active:scale-95"
+                        className="w-full h-[52px] bg-[#2D2D2D] hover:bg-[#1a1a1a] text-[#FF8400] font-medium text-[16px] rounded-[14px] transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer active:scale-95"
                         onClick={handleConfirm}
                     >
                         확인
                     </Button>
-                </DialogFooter>
+                </div>
             </DialogContent>
         </Dialog>
     );

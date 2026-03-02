@@ -55,7 +55,7 @@ export function TrueFalse({ choices, selectedIds, onSelect, isChecked }: TrueFal
                         key={choice.id}
                         onClick={() => !isChecked && onSelect(choice.id)}
                         disabled={isChecked}
-                        className={isChecked ? '' : 'quiz-hover'}
+                        className={isChecked ? '' : 'quiz-hover active:scale-95'}
                         style={{
                             flex: 1, // 가로 2분할
                             height: '120px', // 정사각형 비율 대신 적당한 높이 고정

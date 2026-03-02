@@ -118,6 +118,7 @@ export function ChoiceBlank({
                         ? handleClearBlank(position)
                         : handleBlankClick(position)}
                     disabled={isChecked}
+                    className={isChecked ? '' : 'active:scale-95 transition-transform'}
                     style={{
                         display: 'inline-block',
                         height: '38px',
@@ -218,6 +219,7 @@ export function ChoiceBlank({
                                 key={choice.id}
                                 onClick={() => handleChoiceClick(choice.id)}
                                 disabled={isChecked} // isUsed 여도 다시 클릭해서 취소하거나 다른 빈칸에 넣을 수 있게 허용 (기획에 따라 다를 수 있음)
+                                className={isChecked ? '' : 'active:scale-[0.98] transition-transform'}
                                 style={{
                                     padding: '8px 16px',
                                     backgroundColor: btnBg,

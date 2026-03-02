@@ -213,13 +213,13 @@ export default function ProfilePage() {
                                                 <button
                                                     onClick={saveNickname}
                                                     disabled={!isValid || isSaving || isChecking}
-                                                    className="p-1.5 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-[#FF8400] disabled:opacity-50 disabled:hover:text-gray-400 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                                                    className="p-1.5 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-[#FF8400] disabled:opacity-50 disabled:hover:text-gray-400 transition-all cursor-pointer disabled:cursor-not-allowed active:scale-95"
                                                 >
                                                     <Check size={22} />
                                                 </button>
                                                 <button
                                                     onClick={cancelEditNickname}
-                                                    className="p-1.5 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-[#FF8400] transition-colors cursor-pointer"
+                                                    className="p-1.5 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-[#FF8400] transition-all cursor-pointer active:scale-95"
                                                 >
                                                     <X size={22} />
                                                 </button>
@@ -247,7 +247,7 @@ export default function ProfilePage() {
                                             {dbUser?.nickname}
                                             <button
                                                 onClick={startEditNickname}
-                                                className="absolute right-0 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                                                className="absolute right-0 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all active:scale-95"
                                             >
                                                 <Pencil size={18} />
                                             </button>
@@ -304,7 +304,7 @@ export default function ProfilePage() {
                         onClick={handleLogout}
                         disabled={isLoggingOut}
                         variant="outline"
-                        className="w-full h-12 rounded-xl text-gray-600 border-gray-200 hover:bg-gray-50 font-medium text-sm transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
+                        className="w-full h-12 rounded-xl text-gray-600 border-gray-200 hover:bg-gray-50 font-medium text-sm transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer active:scale-[0.98]"
                     >
                         {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
                     </Button>
@@ -323,7 +323,7 @@ export default function ProfilePage() {
                 {/* 서비스 문의 */}
                 <div className="px-4 pb-4 flex justify-center mt-2 animate-in fade-in duration-500 delay-700 fill-mode-both">
                     <p className="text-xs text-gray-400">
-                        서비스 문의: cognityhelp@gmail.com
+                        이용 문의: cognityhelp@gmail.com
                     </p>
                 </div>
 

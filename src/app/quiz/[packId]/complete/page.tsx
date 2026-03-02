@@ -160,7 +160,7 @@ export default function QuizCompletePage() {
             }}>
                 <button
                     onClick={handleGoHome}
-                    className="hover:-translate-y-1 transition-transform duration-200"
+                    className="hover:-translate-y-1 active:scale-95 transition-transform duration-200"
                     style={{
                         background: 'none',
                         border: 'none',
@@ -258,7 +258,7 @@ export default function QuizCompletePage() {
 
                     <button
                         onClick={handleViewResults}
-                        className="hover:-translate-y-1 transition-transform duration-200"
+                        className="hover:-translate-y-1 active:scale-95 transition-all duration-200"
                         style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -366,7 +366,7 @@ export default function QuizCompletePage() {
                 <button
                     onClick={handleNextQuizpack}
                     disabled={isSaving}
-                    className="hover:-translate-y-1 hover:shadow-lg transition-all duration-200"
+                    className="hover:-translate-y-1 hover:shadow-lg active:scale-[0.98] transition-all duration-200"
                     style={{
                         width: '100%',
                         padding: '16px',
@@ -387,7 +387,7 @@ export default function QuizCompletePage() {
                     <button
                         onClick={handleRestart}
                         disabled={isSaving}
-                        className="hover:-translate-y-1 hover:shadow-lg transition-all duration-200"
+                        className="hover:-translate-y-1 hover:shadow-lg active:scale-[0.98] transition-all duration-200"
                         style={{
                             flex: 1,
                             padding: '16px',
@@ -405,7 +405,7 @@ export default function QuizCompletePage() {
                     <button
                         onClick={handleGoHome}
                         disabled={isSaving}
-                        className="hover:-translate-y-1 hover:shadow-lg transition-all duration-200"
+                        className="hover:-translate-y-1 hover:shadow-lg active:scale-[0.98] transition-all duration-200"
                         style={{
                             flex: 1,
                             padding: '16px',

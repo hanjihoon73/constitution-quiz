@@ -65,7 +65,7 @@ export function MultipleChoice({ choices, selectedIds, onSelect, isChecked }: Mu
                         key={choice.id}
                         onClick={() => !isChecked && onSelect(choice.id)}
                         disabled={isChecked}
-                        className={isChecked ? '' : 'quiz-hover'}
+                        className={isChecked ? '' : 'quiz-hover active:scale-[0.98]'}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
