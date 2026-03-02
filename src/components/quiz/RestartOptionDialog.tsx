@@ -40,7 +40,7 @@ export function RestartOptionDialog({ open, onClose, onViewResults, onRestart }:
                 <div className="flex flex-col gap-3 mt-6">
                     <Button
                         type="button"
-                        className="w-full h-[52px] bg-[#2D2D2D] hover:bg-[#1a1a1a] text-[#FF8400] font-medium text-[16px] rounded-[14px] transition-all hover:-translate-y-0.5 hover:shadow-md"
+                        className="w-full h-[52px] bg-[#2D2D2D] hover:bg-[#1a1a1a] text-[#FF8400] font-medium text-[16px] rounded-[14px] transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
                         onClick={onViewResults}
                     >
                         결과 보기
@@ -48,7 +48,7 @@ export function RestartOptionDialog({ open, onClose, onViewResults, onRestart }:
                     <Button
                         type="button"
                         variant="ghost"
-                        className="w-full h-[52px] bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#888888] font-medium text-[16px] rounded-[14px] border border-[#E5E7EB] transition-all hover:-translate-y-0.5 hover:shadow-md"
+                        className="w-full h-[52px] bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#888888] font-medium text-[16px] rounded-[14px] border border-[#E5E7EB] transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
                         onClick={onRestart}
                     >
                         다시 풀기

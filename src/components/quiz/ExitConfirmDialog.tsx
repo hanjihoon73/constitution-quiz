@@ -1,5 +1,14 @@
 'use client';
 
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { TriangleAlert } from 'lucide-react';
+
 interface ExitConfirmDialogProps {
     isOpen: boolean;
     onClose: () => void;
@@ -10,103 +19,49 @@ interface ExitConfirmDialogProps {
  * 퀴즈 중단 확인 다이얼로그
  */
 export function ExitConfirmDialog({ isOpen, onClose, onConfirm }: ExitConfirmDialogProps) {
-    if (!isOpen) return null;
-
     const handleConfirm = () => {
         console.log('[ExitConfirmDialog] 나가기 버튼 클릭됨');
         onConfirm();
     };
 
     return (
-        <>
-            {/* 배경 오버레이 */}
-            <div
-                style={{
-                    position: 'fixed',
-                    inset: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    zIndex: 9998,
-                }}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onClose();
-                }}
-            />
-
-            {/* 다이얼로그 */}
-            <div
-                onClick={(e) => e.stopPropagation()}
-                style={{
-                    position: 'fixed',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    backgroundColor: 'white',
-                    borderRadius: '16px',
-                    padding: '24px',
-                    width: '280px',
-                    zIndex: 9999,
-                    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
-                }}
+        <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+            <DialogContent
+                className="sm:max-w-md bg-white rounded-3xl border-none shadow-xl px-8 py-12 max-w-[340px]"
+                onOpenAutoFocus={(e) => e.preventDefault()}
             >
-                <h3 style={{
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    marginBottom: '12px',
-                    textAlign: 'center',
-                }}>
-                    퀴즈를 중단할까요?
-                </h3>
-                <p style={{
-                    fontSize: '14px',
-                    color: '#6b7280',
-                    marginBottom: '24px',
-                    textAlign: 'center',
-                }}>
-                    진행 상황은 저장됩니다.<br />
-                    나중에 이어서 풀 수 있어요.
-                </p>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                    <button
+                <DialogHeader className="flex flex-col items-center gap-1 text-center">
+                    <div className="flex justify-center mb-3">
+                        <TriangleAlert className="w-[72px] h-[72px] text-[#111111] stroke-[2]" />
+                    </div>
+                    <DialogTitle className="text-[20px] font-bold text-[#111111] mb-2">
+                        퀴즈팩을 중단할까요?
+                    </DialogTitle>
+                    <p className="text-[#888888] text-[15px] font-medium leading-relaxed text-center">
+                        지금까지 풀었던 퀴즈는 저장됩니다.<br />
+                        나중에 이어서 풀 수 있어요.
+                    </p>
+                </DialogHeader>
+
+                {/* 버튼 영역 */}
+                <div className="flex flex-col gap-3 mt-6">
+                    <Button
                         type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onClose();
-                        }}
-                        style={{
-                            flex: 1,
-                            padding: '12px',
-                            borderRadius: '8px',
-                            border: '1px solid #e5e7eb',
-                            backgroundColor: 'white',
-                            cursor: 'pointer',
-                            fontWeight: '500',
-                        }}
-                    >
-                        계속 풀기
-                    </button>
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            handleConfirm();
-                        }}
-                        style={{
-                            flex: 1,
-                            padding: '12px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            backgroundColor: '#ef4444',
-                            color: 'white',
-                            cursor: 'pointer',
-                            fontWeight: '500',
-                        }}
+                        className="w-full h-[52px] bg-[#2D2D2D] hover:bg-[#1a1a1a] text-[#FF8400] font-medium text-[16px] rounded-[14px] transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
+                        onClick={handleConfirm}
                     >
                         나가기
-                    </button>
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        className="w-full h-[52px] bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#888888] font-medium text-[16px] rounded-[14px] border border-[#E5E7EB] transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
+                        onClick={onClose}
+                    >
+                        계속 풀기
+                    </Button>
                 </div>
-            </div>
-        </>
+            </DialogContent>
+        </Dialog>
     );
 }
