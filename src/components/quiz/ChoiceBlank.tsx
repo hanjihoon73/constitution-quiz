@@ -14,12 +14,15 @@ interface ChoiceBlankProps {
 }
 
 // 색상 상수 (빈칸 & 보기 버튼 공통)
-const COLOR = {
-    correct: { bg: '#DAF5FF', border: '#38D2E3', text: '#2D2D2D' }, // 정답 시안색
-    wrong: { bg: '#FEE6F3', border: '#FB84C5', text: '#2D2D2D' },   // 오답 핑크색
-    selected: { bg: '#FFEEDB', border: '#FF8400', text: '#2D2D2D' }, // 빈칸에 보기가 채워졌을 때
+type ColorTheme = { bg: string; border: string; text: string; badgeBg?: string; badgeText?: string; };
+
+const COLOR: Record<string, ColorTheme> = {
+    correct: { bg: '#DAF5FF', border: '#38D2E3', text: '#2D2D2D', badgeBg: '#38D2E3', badgeText: '#ffffff' }, // 정답 시안색
+    wrong: { bg: '#FEE6F3', border: '#FB84C5', text: '#2D2D2D', badgeBg: '#FB84C5', badgeText: '#ffffff' },   // 오답 핑크색
+    selected: { bg: '#FFEEDB', border: '#FF8400', text: '#2D2D2D', badgeBg: '#ff8400', badgeText: '#ffffff' }, // 빈칸 채워짐 (빈칸 뱃지 주황)
     active: { bg: '#ffffff', border: '#FF8400', text: '#FF8400' },   // 클릭 활성화
     default: { bg: '#ffffff', border: '#D2D2D2', text: '#2D2D2D' }, // 기본 비활성/빈칸
+    choiceUsed: { bg: '#F3F4F6', border: '#D2D2D2', text: '#9CA3AF', badgeBg: '#BEBEBE', badgeText: '#ffffff' }, // 채워진 보기 회색 뱃지
 };
 
 /**
@@ -112,36 +115,57 @@ export function ChoiceBlank({
             }
 
             return (
-                <button
-                    key={`blank-${i}`}
-                    onClick={() => filledChoice && !isChecked
-                        ? handleClearBlank(position)
-                        : handleBlankClick(position)}
-                    disabled={isChecked}
-                    className={isChecked ? '' : 'active:scale-95 transition-transform'}
-                    style={{
-                        display: 'inline-block',
-                        height: '38px',
-                        lineHeight: '36px', // 테두리 1px*2 패딩 보정
-                        minWidth: '72px',
-                        padding: '0 16px',
-                        margin: '0 6px',
-                        backgroundColor: colors.bg,
-                        border: `1px solid ${colors.border}`,
-                        borderRadius: '8px',
-                        cursor: isChecked ? 'default' : 'pointer',
-                        fontSize: '15px',
-                        fontWeight: 'bold',
-                        color: colors.text,
-                        transition: 'all 0.2s ease',
-                        verticalAlign: 'bottom', // 텍스트 줄 기준
-                        position: 'relative',
-                        top: '-2px', // 시각적 중앙 정렬 미세 조정
-                        textAlign: 'center',
-                    }}
-                >
-                    {filledChoice ? filledChoice.choiceText : `빈칸${position}`}
-                </button>
+                <div key={`blank-container-${i}`} style={{ display: 'inline-block', position: 'relative', margin: '0 6px' }}>
+                    <button
+                        onClick={() => filledChoice && !isChecked
+                            ? handleClearBlank(position)
+                            : handleBlankClick(position)}
+                        disabled={isChecked}
+                        className={isChecked ? '' : 'active:scale-95 transition-transform'}
+                        style={{
+                            display: 'inline-block',
+                            height: '38px',
+                            lineHeight: '36px', // 테두리 1px*2 패딩 보정
+                            minWidth: '72px',
+                            padding: '0 16px',
+                            backgroundColor: colors.bg,
+                            border: `1px solid ${colors.border}`,
+                            borderRadius: '8px',
+                            cursor: isChecked ? 'default' : 'pointer',
+                            fontSize: '15px',
+                            fontWeight: 'bold',
+                            color: colors.text,
+                            transition: 'all 0.2s ease',
+                            verticalAlign: 'bottom', // 텍스트 줄 기준
+                            position: 'relative',
+                            top: '-2px', // 시각적 중앙 정렬 미세 조정
+                            textAlign: 'center',
+                        }}
+                    >
+                        {filledChoice ? filledChoice.choiceText : `빈칸${position}`}
+                    </button>
+                    {/* 빈칸 뱃지 렌더링 */}
+                    {filledChoice && colors.badgeBg && (
+                        <div style={{
+                            position: 'absolute',
+                            top: '-4px', // 기존 -8px에서 약간 아래(-4px)로 변경
+                            right: '-6px',
+                            width: '18px',
+                            height: '18px',
+                            borderRadius: '50%',
+                            backgroundColor: colors.badgeBg,
+                            color: colors.badgeText,
+                            fontSize: '11px',
+                            fontWeight: 'bold',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 10,
+                        }}>
+                            {position}
+                        </div>
+                    )}
+                </div>
             );
         });
     };
@@ -186,17 +210,31 @@ export function ChoiceBlank({
                         const isUsed = usedChoiceIds.includes(choice.id);
                         const isSelectedNow = selectedChoice === choice.id;
 
+                        // 현재 보기가 채워진 빈칸 번호 찾기 (뱃지 표시용)
+                        let matchedPosition: number | null = null;
+                        for (const [pos, cId] of blankAnswers.entries()) {
+                            if (cId === choice.id) {
+                                matchedPosition = pos;
+                                break;
+                            }
+                        }
+
                         // 보기 버튼 전용 배경/텍스트/보더 오버라이드
                         let btnBg = '#ffffff';
                         let btnBorder = '#D2D2D2';
                         let btnText = '#2D2D2D'; // 미선택 보기의 폰트 색상을 #2D2D2D로 수정
                         let btnOpacity = 1;
+                        let badgeBg: string | null = null;
+                        let badgeText: string | null = null;
 
                         if (isChecked) {
                             if (choice.isCorrect) {
+                                // 정답인 보기의 경우 시안색 뱃지 표시
                                 btnBg = COLOR.correct.bg;
                                 btnBorder = COLOR.correct.border;
                                 btnText = COLOR.correct.text;
+                                badgeBg = COLOR.correct.badgeBg as string;
+                                badgeText = COLOR.correct.badgeText as string;
                             } else {
                                 btnBg = COLOR.default.bg;
                                 btnBorder = COLOR.default.border;
@@ -204,9 +242,11 @@ export function ChoiceBlank({
                             }
                         } else if (isUsed) {
                             // 지문에 넣은(사용된) 보기 상태
-                            btnBg = '#F3F4F6';     // 연한 회색 배경
-                            btnBorder = '#D2D2D2'; // 연한 회색 테두리
-                            btnText = '#9CA3AF';   // 폰트 연한 회색 (본문은 짙은회색, 아래 보기는 연한회색)
+                            btnBg = COLOR.choiceUsed.bg;
+                            btnBorder = COLOR.choiceUsed.border;
+                            btnText = COLOR.choiceUsed.text;
+                            badgeBg = COLOR.choiceUsed.badgeBg || null;
+                            badgeText = COLOR.choiceUsed.badgeText || null;
                             btnOpacity = 1;        // 색상으로 구분되므로 투명도는 주지 않음
                         } else if (isSelectedNow) {
                             btnBg = COLOR.active.bg;
@@ -215,26 +255,48 @@ export function ChoiceBlank({
                         }
 
                         return (
-                            <button
-                                key={choice.id}
-                                onClick={() => handleChoiceClick(choice.id)}
-                                disabled={isChecked} // isUsed 여도 다시 클릭해서 취소하거나 다른 빈칸에 넣을 수 있게 허용 (기획에 따라 다를 수 있음)
-                                className={isChecked ? '' : 'active:scale-[0.98] transition-transform'}
-                                style={{
-                                    padding: '8px 16px',
-                                    backgroundColor: btnBg,
-                                    color: btnText,
-                                    border: `1px solid ${btnBorder}`,
-                                    borderRadius: '8px', // 살짝 둥근 사각형
-                                    cursor: isChecked ? 'default' : 'pointer',
-                                    fontSize: '15px',
-                                    fontWeight: '500',
-                                    opacity: btnOpacity,
-                                    transition: 'all 0.2s ease',
-                                }}
-                            >
-                                {choice.choiceText}
-                            </button>
+                            <div key={choice.id} style={{ position: 'relative' }}>
+                                <button
+                                    onClick={() => handleChoiceClick(choice.id)}
+                                    disabled={isChecked} // isUsed 여도 다시 클릭해서 취소하거나 다른 빈칸에 넣을 수 있게 허용 (기획에 따라 다를 수 있음)
+                                    className={isChecked ? '' : 'active:scale-[0.98] transition-transform'}
+                                    style={{
+                                        padding: '8px 16px',
+                                        backgroundColor: btnBg,
+                                        color: btnText,
+                                        border: `1px solid ${btnBorder}`,
+                                        borderRadius: '8px', // 살짝 둥근 사각형
+                                        cursor: isChecked ? 'default' : 'pointer',
+                                        fontSize: '15px',
+                                        fontWeight: '500',
+                                        opacity: btnOpacity,
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                >
+                                    {choice.choiceText}
+                                </button>
+                                {/* 보기 뱃지 렌더링 (정오답 체크 전 사용된 보기 or 체크 후 정답 보기) */}
+                                {badgeBg && (matchedPosition !== null || choice.isCorrect) && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '-8px',
+                                        right: '-8px',
+                                        width: '18px',
+                                        height: '18px',
+                                        borderRadius: '50%',
+                                        backgroundColor: badgeBg,
+                                        color: badgeText || '#ffffff',
+                                        fontSize: '11px',
+                                        fontWeight: 'bold',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        zIndex: 10,
+                                    }}>
+                                        {isChecked && choice.isCorrect ? choice.blankPosition : matchedPosition}
+                                    </div>
+                                )}
+                            </div>
                         );
                     })}
                 </div>
