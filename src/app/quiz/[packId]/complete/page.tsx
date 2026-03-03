@@ -23,6 +23,7 @@ export default function QuizCompletePage() {
     const { dbUser } = useAuth();
 
     const [result, setResult] = useState<QuizResult | null>(null);
+    const [displayRate, setDisplayRate] = useState<number>(0);
     const [rating, setRating] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -63,6 +64,38 @@ export default function QuizCompletePage() {
             }, 300);
         }
     }, [isLoading, result, fireConfetti]);
+
+    // 정답률 카운트업 및 원형 차트 애니메이션
+    useEffect(() => {
+        if (!result || result.correctRate === undefined) return;
+
+        let animationFrameId: number;
+        let startTimestamp: number | null = null;
+        const targetRate = result.correctRate;
+        const duration = 1500; // 1.5초 동안 서서히 증가
+
+        const step = (timestamp: number) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+            // easeOutQuart 이징 함수 (점점 느려지는 효과)
+            const easeOutProgress = 1 - Math.pow(1 - progress, 4);
+
+            setDisplayRate(targetRate * easeOutProgress);
+
+            if (progress < 1) {
+                animationFrameId = requestAnimationFrame(step);
+            } else {
+                setDisplayRate(targetRate);
+            }
+        };
+
+        animationFrameId = requestAnimationFrame(step);
+
+        return () => {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        };
+    }, [result]);
 
     // 통계/평점 저장 후 이동
     const handleSaveAndNavigate = useCallback(async (destination: 'next' | 'home') => {
@@ -189,12 +222,6 @@ export default function QuizCompletePage() {
                 }}>
                     퀴즈팩 {String(packId).padStart(3, '0')} 완료!
                 </h1>
-                <p style={{
-                    fontSize: '15px',
-                    color: '#6B7280',
-                }}>
-                    수고하셨습니다.
-                </p>
             </div>
 
             {/* 정답률 원형 & 결과보기 버튼 */}
@@ -210,7 +237,7 @@ export default function QuizCompletePage() {
                     width: '140px',
                     height: '140px',
                     borderRadius: '50%',
-                    background: `conic-gradient(#FF8400 ${(result?.correctRate || 0) * 3.6}deg, #E5E7EB 0deg)`,
+                    background: `conic-gradient(#FF8400 ${displayRate * 3.6}deg, #E5E7EB 0deg)`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -229,7 +256,7 @@ export default function QuizCompletePage() {
                             fontWeight: 'bold',
                             color: '#FF8400',
                         }}>
-                            {result?.correctRate?.toFixed(0) || 0}%
+                            {Math.round(displayRate)}%
                         </span>
                     </div>
                 </div>
