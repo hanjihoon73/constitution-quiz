@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Quiz, QuizPackData, getQuizzesByPackId, saveQuizProgress, getUserQuizProgress, saveUserQuizAnswer, getUserQuizpackId, getUserPreviousAnswers, updateUserQuizpackCurrentOrder, initializeUserQuizpack, resetUserQuizpack } from '@/lib/api/quiz';
+import { calculateQuizXP, updatePendingXP, confirmQuizpackXP } from '@/lib/api/xp';
 import { seededShuffle } from '@/lib/utils/seededShuffle';
 import { useAuth } from '@/components/auth';
 
@@ -24,6 +25,10 @@ interface UseQuizState {
     error: Error | null;
     startTime: Date | null;
     userQuizpackId: number | null;
+    // XP 관련 상태
+    comboCount: number;           // 연속 정답 카운트
+    hintUsedMap: Set<number>;     // 힌트를 사용한 퀴즈 ID 집합
+    sessionNumber: number;        // 현재 세션 번호 (1회차 판별용)
 }
 
 interface UseQuizReturn extends UseQuizState {
@@ -62,6 +67,9 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
         error: null,
         startTime: null,
         userQuizpackId: null,
+        comboCount: 0,
+        hintUsedMap: new Set(),
+        sessionNumber: 0,
     });
 
     const isLoadingRef = useRef(false);
@@ -90,6 +98,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                 // 기존 진행 상태 확인 (이어하기)
                 let startIndex = 0;
                 let userQuizpackId: number | null = null;
+                let sessionNumber = 0;
                 const restoredAnswers = new Map<number, UserAnswer>();
 
                 if (dbUser?.id) {
@@ -105,7 +114,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                         const progress = await getUserQuizProgress(dbUser.id, packId);
 
                         // 보기 셔플: session_number 기반으로 매 세션마다 다른 순서
-                        const sessionNumber = progress?.session_number || 1;
+                        sessionNumber = progress?.session_number || 1;
                         data.quizzes = data.quizzes.map(quiz => ({
                             ...quiz,
                             choices: seededShuffle(
@@ -182,6 +191,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                     isLoading: false,
                     startTime: new Date(),
                     userQuizpackId,
+                    sessionNumber: sessionNumber,
                 }));
             } catch (err) {
                 console.error('퀴즈 로드 에러:', err);
@@ -301,14 +311,26 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                 userAnswer.selectedChoiceIds.every(id => correctChoiceIds.includes(id));
         }
 
-        // 정답 여부 저장
+        // 힌트 사용 여부
+        const hintUsed = state.hintUsedMap.has(currentQuiz.id);
+
+        // 콤보 카운트 업데이트
+        const newComboCount = isCorrect ? state.comboCount + 1 : 0;
+
+        // 정답 여부 저장 + 콤보 카운트 업데이트
         setState(prev => {
             const newAnswers = new Map(prev.answers);
             const existing = newAnswers.get(currentQuiz.id);
             if (existing) {
                 newAnswers.set(currentQuiz.id, { ...existing, isCorrect });
             }
-            return { ...prev, answers: newAnswers, isChecked: true, showExplanation: true };
+            return {
+                ...prev,
+                answers: newAnswers,
+                isChecked: true,
+                showExplanation: true,
+                comboCount: newComboCount,
+            };
         });
 
         // user_quizzes 테이블에 저장 (비동기, 에러 무시)
@@ -323,12 +345,50 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                 state.userQuizpackId,
                 state.currentIndex + 1,
                 selectedAnswers,
-                isCorrect
+                isCorrect,
+                hintUsed
             ).catch(err => console.error('퀴즈 답변 저장 에러:', err));
+
+            // XP 처리 (1회차 퀴즈팩만)
+            if (state.sessionNumber === 1) {
+                const quizData = state.packData?.quizzes[state.currentIndex];
+                // XP 관련 값을 로컬 변수로 캡처 (closure 문제 방지)
+                const capturedUserQuizpackId = state.userQuizpackId;
+                const capturedUserId = dbUser.id;
+                const capturedIsLastQuiz = isLastQuiz;
+                const capturedDifficultyId = quizData?.difficultyId || 3;
+
+                if (quizData && capturedUserQuizpackId) {
+                    // 즉시 실행 async 함수로 비동기 체인 격리
+                    (async () => {
+                        try {
+                            const xpDelta = await calculateQuizXP(
+                                capturedDifficultyId,
+                                isCorrect,
+                                hintUsed,
+                                newComboCount
+                            );
+                            console.log(`[XP] 퀴즈 ${state.currentIndex + 1}: diffId=${capturedDifficultyId}, correct=${isCorrect}, hint=${hintUsed}, combo=${newComboCount}, xpDelta=${xpDelta}`);
+
+                            if (xpDelta !== 0) {
+                                await updatePendingXP(capturedUserQuizpackId, xpDelta);
+                            }
+
+                            // 마지막 퀴즈인 경우 XP 확정
+                            if (capturedIsLastQuiz) {
+                                await confirmQuizpackXP(capturedUserId, capturedUserQuizpackId);
+                                console.log('[XP] 퀴즈팩 XP 확정 완료');
+                            }
+                        } catch (err) {
+                            console.error('[XP] XP 처리 에러:', err);
+                        }
+                    })();
+                }
+            }
         }
 
         return isCorrect;
-    }, [currentQuiz, state.answers, dbUser?.id, state.userQuizpackId, state.currentIndex]);
+    }, [currentQuiz, state.answers, state.hintUsedMap, state.comboCount, state.sessionNumber, state.packData, dbUser?.id, state.userQuizpackId, state.currentIndex, isLastQuiz]);
 
     // 다음 퀴즈로 이동
     const goToNext = useCallback(() => {
@@ -398,10 +458,19 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
         });
     }, [totalQuizzes]);
 
-    // 힌트 토글
+    // 힌트 토글 (힌트를 처음 열 때 hintUsedMap에 기록)
     const toggleHint = useCallback(() => {
-        setState(prev => ({ ...prev, showHint: !prev.showHint }));
-    }, []);
+        setState(prev => {
+            const newState = { ...prev, showHint: !prev.showHint };
+            // 힌트를 처음 여는 경우에만 기록
+            if (!prev.showHint && currentQuiz) {
+                const newHintUsedMap = new Set(prev.hintUsedMap);
+                newHintUsedMap.add(currentQuiz.id);
+                newState.hintUsedMap = newHintUsedMap;
+            }
+            return newState;
+        });
+    }, [currentQuiz]);
 
     // 해설 토글
     const toggleExplanation = useCallback(() => {

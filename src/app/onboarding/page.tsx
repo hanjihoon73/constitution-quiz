@@ -9,6 +9,7 @@ import { MobileFrame } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { grantOnboardingXP } from '@/lib/api/xp';
 
 // 닉네임 유효성 검사 정규식 (2-10자, 한글/영문/숫자만)
 const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9]{2,10}$/;
@@ -214,6 +215,14 @@ export default function OnboardingPage() {
                     provider: data.provider,
                     action: 'login'
                 });
+
+                // 온보딩 완료 XP 지급 (+500)
+                try {
+                    await grantOnboardingXP(data.id);
+                } catch (xpErr) {
+                    console.error('[온보딩] XP 지급 에러:', xpErr);
+                    // XP 지급 실패는 치명적이지 않으므로 진행
+                }
             }
 
             // 저장 성공! 전체 페이지를 새로고침하여 AuthProvider가 dbUser를 확실히 로드하도록 함

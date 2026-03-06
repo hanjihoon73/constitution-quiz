@@ -20,6 +20,7 @@ export interface Quiz {
     hint: string;
     explanation: string;
     blankCount: number | null;
+    difficultyId: number | null;
     choices: QuizChoice[];
 }
 
@@ -59,6 +60,7 @@ export async function getQuizzesByPackId(packId: number): Promise<QuizPackData> 
             hint,
             explanation,
             blank_count,
+            difficulty_id,
             quiz_choices (
                 id,
                 choice_text,
@@ -87,6 +89,7 @@ export async function getQuizzesByPackId(packId: number): Promise<QuizPackData> 
         hint: q.hint,
         explanation: q.explanation,
         blankCount: q.blank_count,
+        difficultyId: q.difficulty_id,
         choices: (q.quiz_choices || []).map((c) => ({
             id: c.id,
             choiceText: c.choice_text,
@@ -238,7 +241,8 @@ export async function saveUserQuizAnswer(
     userQuizpackId: number,
     quizOrder: number,
     selectedAnswers: number[] | Record<number, number>,
-    isCorrect: boolean
+    isCorrect: boolean,
+    hintUsed: boolean = false
 ) {
     const supabase = createClient();
 
@@ -257,6 +261,7 @@ export async function saveUserQuizAnswer(
             .update({
                 selected_answers: selectedAnswers,
                 is_correct: isCorrect,
+                hint_used: hintUsed,
                 answered_at: new Date().toISOString(),
             })
             .eq('id', existing.id);
@@ -276,6 +281,7 @@ export async function saveUserQuizAnswer(
                 quiz_order: quizOrder,
                 selected_answers: selectedAnswers,
                 is_correct: isCorrect,
+                hint_used: hintUsed,
                 answered_at: new Date().toISOString(),
             });
 
@@ -810,6 +816,16 @@ export async function getInProgressQuizpack(userId: number, excludePackId?: numb
  */
 export async function abortInProgressQuizpack(userQuizpackId: number) {
     const supabase = createClient();
+
+    // 0. pending_xp 리셋 (XP 확정 전 중단이므로 임시 XP 초기화)
+    const { error: xpResetError } = await supabase
+        .from('user_quizpacks')
+        .update({ pending_xp: 0 })
+        .eq('id', userQuizpackId);
+
+    if (xpResetError) {
+        console.error('[abortInProgressQuizpack] pending_xp 리셋 에러:', xpResetError);
+    }
 
     // 1. 현재 세션에서 풀었던 답변이 있는지 확인
     const { count: answerCount } = await supabase
