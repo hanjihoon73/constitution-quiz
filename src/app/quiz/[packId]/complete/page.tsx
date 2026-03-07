@@ -14,6 +14,7 @@ interface QuizResult {
     incorrectCount: number;
     correctRate: number;
     totalTimeSeconds: number;
+    earnedXp: number;
 }
 
 export default function QuizCompletePage() {
@@ -25,6 +26,7 @@ export default function QuizCompletePage() {
     const [result, setResult] = useState<QuizResult | null>(null);
     const [circleRate, setCircleRate] = useState<number>(0);
     const [textRate, setTextRate] = useState<number>(0);
+    const [xpRate, setXpRate] = useState<number>(0);
     const [rating, setRating] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -43,6 +45,7 @@ export default function QuizCompletePage() {
                         incorrectCount: progress.incorrect_count || 0,
                         correctRate: progress.correct_rate || 0,
                         totalTimeSeconds: progress.total_time_seconds || 0,
+                        earnedXp: progress.earned_xp || 0,
                     });
                 }
             } catch (error) {
@@ -72,10 +75,13 @@ export default function QuizCompletePage() {
 
         let circleFrameId: number;
         let textFrameId: number;
+        let xpFrameId: number;
         let circleStart: number | null = null;
         let textStart: number | null = null;
+        let xpStart: number | null = null;
 
         const targetRate = result.correctRate;
+        const targetXp = result.earnedXp;
         const circleDuration = 1000;
         const textDuration = 1000;
 
@@ -105,6 +111,20 @@ export default function QuizCompletePage() {
             }
         };
 
+        // XP 카운트업 애니메이션
+        const animateXp = (timestamp: number) => {
+            if (!xpStart) xpStart = timestamp;
+            const progress = Math.min((timestamp - xpStart) / textDuration, 1);
+            const easeOutProgress = 1 - Math.pow(1 - progress, 4);
+            setXpRate(targetXp * easeOutProgress);
+
+            if (progress < 1) {
+                xpFrameId = requestAnimationFrame(animateXp);
+            } else {
+                setXpRate(targetXp);
+            }
+        };
+
         // 1. 콘페티 폭죽은 위쪽 useEffect에서 100ms 뒤에 터집니다.
         // 2. 폭죽이 터진 후 200ms(전체 기준 300ms) 뒤에 써클 애니메이션 시작
         const circleTimeout = setTimeout(() => {
@@ -114,6 +134,7 @@ export default function QuizCompletePage() {
         // 3. 써클이 어느 정도 그려진 후 (전체 기준 600ms) 텍스트 카운트업 시작
         const textTimeout = setTimeout(() => {
             textFrameId = requestAnimationFrame(animateText);
+            xpFrameId = requestAnimationFrame(animateXp);
         }, 600);
 
         return () => {
@@ -121,6 +142,7 @@ export default function QuizCompletePage() {
             clearTimeout(textTimeout);
             if (circleFrameId) cancelAnimationFrame(circleFrameId);
             if (textFrameId) cancelAnimationFrame(textFrameId);
+            if (xpFrameId) cancelAnimationFrame(xpFrameId);
         };
     }, [result]);
 
@@ -237,7 +259,7 @@ export default function QuizCompletePage() {
 
             {/* 상단 축하 메시지 */}
             <div className="animate-fade-in-up delay-100" style={{
-                padding: '20px 20px 10px',
+                padding: '10px 20px 10px',
                 textAlign: 'center',
                 display: 'flex',
                 flexDirection: 'column',
@@ -261,7 +283,7 @@ export default function QuizCompletePage() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                marginTop: '20px',
+                marginTop: '10px',
                 marginBottom: '6px',
                 position: 'relative'
             }}>
@@ -269,27 +291,37 @@ export default function QuizCompletePage() {
                     width: '140px',
                     height: '140px',
                     borderRadius: '50%',
-                    background: `conic-gradient(#FF8400 ${circleRate * 3.6}deg, #E5E7EB 0deg)`,
+                    // 1. 바탕색을 #2D2D2D로 변경
+                    // 2. 바 끝부분(캡)을 둥글게 하기 위해 시작 부분과 끝 부분에 둥근 조각(radial-gradient)을 추가합니다.
+                    //    바 두께는 15px (140 - 110 = 30 / 2 = 15)이므로 조각의 반지름은 7.5px입니다.
+                    //    중심 반경은 62.5px(70 - 7.5)입니다.
+                    background: `
+                        radial-gradient(circle at 50% 7.5px, #FF8400 7px, transparent 7.5px),
+                        radial-gradient(circle at calc(50% + ${62.5 * Math.sin((circleRate * 3.6 * Math.PI) / 180)}px) calc(50% - ${62.5 * Math.cos((circleRate * 3.6 * Math.PI) / 180)}px), #FF8400 7px, transparent 7.5px),
+                        conic-gradient(#FF8400 ${circleRate * 3.6}deg, #2D2D2D 0deg)
+                    `,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                 }}>
                     <div style={{
-                        width: '116px',
-                        height: '116px',
+                        width: '110px',
+                        height: '110px',
                         borderRadius: '50%',
                         backgroundColor: 'white',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                     }}>
-                        <span style={{
-                            fontSize: '36px',
+                        <div style={{
                             fontWeight: 'bold',
                             color: '#FF8400',
+                            display: 'flex',
+                            alignItems: 'baseline'
                         }}>
-                            {Math.round(textRate)}%
-                        </span>
+                            <span style={{ fontSize: '48px' }}>{Math.round(textRate)}</span>
+                            <span style={{ fontSize: '30px', marginLeft: '1px' }}>%</span>
+                        </div>
                     </div>
                 </div>
 
@@ -339,7 +371,7 @@ export default function QuizCompletePage() {
                 backgroundColor: 'white',
                 border: '1px solid #E5E7EB',
                 borderRadius: '16px',
-                padding: '24px 0',
+                padding: '18px 0',
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'space-evenly',
@@ -350,21 +382,24 @@ export default function QuizCompletePage() {
                     <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#2D2D2D', marginBottom: '4px' }}>
                         {result?.totalQuizCount || 0}
                     </div>
-                    <div style={{ fontSize: '13px', color: '#9CA3AF' }}>퀴즈</div>
+                    <div style={{ fontSize: '16px', color: '#9CA3AF' }}>퀴즈</div>
                 </div>
                 {/* 정답 */}
                 <div style={{ textAlign: 'center', flex: 1, borderRight: '1px solid #E5E7EB' }}>
                     <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#38D2E3', marginBottom: '4px' }}>
                         {result?.correctCount || 0}
                     </div>
-                    <div style={{ fontSize: '13px', color: '#9CA3AF' }}>정답</div>
+                    <div style={{ fontSize: '16px', color: '#9CA3AF' }}>정답</div>
                 </div>
-                {/* 오답 */}
+                {/* 획득 XP */}
                 <div style={{ textAlign: 'center', flex: 1 }}>
-                    <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#FB84C5', marginBottom: '4px' }}>
-                        {result?.incorrectCount || 0}
+                    <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#FF8400', marginBottom: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: '36px', marginRight: '2px' }}>
+                            {Math.round(xpRate) > 0 ? '+' : Math.round(xpRate) < 0 ? '-' : ''}
+                        </span>
+                        <span>{Math.abs(Math.round(xpRate))}</span>
                     </div>
-                    <div style={{ fontSize: '13px', color: '#9CA3AF' }}>오답</div>
+                    <div style={{ fontSize: '16px', color: '#9CA3AF' }}>XP</div>
                 </div>
             </div>
 

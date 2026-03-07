@@ -14,6 +14,8 @@ export interface QuizpackWithStatus {
     currentQuizOrder: number | null;
     totalQuizCount: number;
     solvedQuizCount: number | null;
+    pendingXp: number | null;
+    earnedXp: number | null;
 }
 
 /**
@@ -117,6 +119,8 @@ export async function getQuizpacksWithStatus(userId: number): Promise<QuizpackWi
             currentQuizOrder: userQuizpack?.current_quiz_order || null,
             totalQuizCount: userQuizpack?.total_quiz_count || quizpack.quiz_count_all || 0,
             solvedQuizCount: userQuizpack?.solved_quiz_count || null,
+            pendingXp: userQuizpack?.pending_xp || 0,
+            earnedXp: userQuizpack?.earned_xp || 0,
         };
     });
 

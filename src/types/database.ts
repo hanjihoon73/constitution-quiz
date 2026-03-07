@@ -401,6 +401,8 @@ export type Database = {
                     total_quiz_count: number
                     total_time_seconds: number | null
                     user_id: number
+                    pending_xp: number | null
+                    earned_xp: number | null
                 }
                 Insert: {
                     completed_at?: string | null
@@ -421,6 +423,8 @@ export type Database = {
                     total_quiz_count: number
                     total_time_seconds?: number | null
                     user_id: number
+                    pending_xp?: number | null
+                    earned_xp?: number | null
                 }
                 Update: {
                     completed_at?: string | null
@@ -441,6 +445,8 @@ export type Database = {
                     total_quiz_count?: number
                     total_time_seconds?: number | null
                     user_id?: number
+                    pending_xp?: number | null
+                    earned_xp?: number | null
                 }
                 Relationships: []
             }
@@ -499,6 +505,8 @@ export type Database = {
                     provider: Database["public"]["Enums"]["auth_provider"]
                     provider_id: string
                     role: Database["public"]["Enums"]["user_role"] | null
+                    total_xp: number
+                    weekly_xp: number
                 }
                 Insert: {
                     created_at?: string | null
@@ -509,6 +517,8 @@ export type Database = {
                     provider: Database["public"]["Enums"]["auth_provider"]
                     provider_id: string
                     role?: Database["public"]["Enums"]["user_role"] | null
+                    total_xp?: number
+                    weekly_xp?: number
                 }
                 Update: {
                     created_at?: string | null
@@ -519,6 +529,8 @@ export type Database = {
                     provider?: Database["public"]["Enums"]["auth_provider"]
                     provider_id?: string
                     role?: Database["public"]["Enums"]["user_role"] | null
+                    total_xp?: number
+                    weekly_xp?: number
                 }
                 Relationships: []
             }

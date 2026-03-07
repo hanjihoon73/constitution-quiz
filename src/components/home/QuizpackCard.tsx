@@ -47,7 +47,7 @@ export function QuizpackCard({ quizpack, onCompletedClick, onOpenedClick, isCurr
 
     // 컨테이너 스타일 결정
     const getContainerClasses = () => {
-        const base = "rounded-[16px] p-5 mb-3 transition-all duration-200 active:scale-[0.98]";
+        const base = "relative rounded-[16px] p-5 mb-3 transition-all duration-200 active:scale-[0.98]";
         switch (quizpack.status) {
             case 'closed':
                 return `${base} bg-gray-100 border border-gray-300 cursor-default`;
@@ -111,35 +111,48 @@ export function QuizpackCard({ quizpack, onCompletedClick, onOpenedClick, isCurr
                 })}
             </div>
 
-            {/* 퀴즈 개수 */}
-            <p className={`text-[13px] mb-3 ${quizpack.status === 'closed' ? 'text-gray-400' : 'text-gray-600'}`}>
-                퀴즈 {quizpack.quizCount}개
-            </p>
+            {/* 퀴즈 개수 및 별점 */}
+            <div className={`flex items-center text-[13px] mb-3 ${quizpack.status === 'closed' ? 'text-gray-400' : 'text-gray-600'}`}>
+                <span>퀴즈 {quizpack.quizCount}개</span>
+                {quizpack.status !== 'closed' && quizpack.status !== 'opened' && quizpack.averageRating !== null && Number(quizpack.averageRating) > 0 && (
+                    <>
+                        <span className="mx-2 text-gray-300">|</span>
+                        <div className="flex items-center">
+                            <Star className="w-[14px] h-[14px] mr-1 text-[#FF8400] fill-[#FF8400]" />
+                            {Number(quizpack.averageRating).toFixed(1)}
+                        </div>
+                    </>
+                )}
+            </div>
 
             {/* 하단 영역 (상태에 따라 유동적) */}
             {quizpack.status === 'in_progress' ? (
                 <div>
-                    {/* 진행중 - 풀고 있는 중이에요 & 별점 */}
-                    <div className="flex justify-between items-end mb-2">
-                        <span className="text-[#FF8400] text-[13px] font-medium">풀고 있는 중이에요</span>
-                        {quizpack.averageRating !== null && quizpack.averageRating > 0 && (
-                            <div className="flex items-center text-[13px] text-gray-700 font-medium">
-                                <Star className="w-[14px] h-[14px] mr-1 text-[#FF8400] fill-[#FF8400]" />
-                                {quizpack.averageRating.toFixed(1)}
+                    {/* 진행중 - 풀고 있는 중이에요 & 진행률 & XP */}
+                    <div className="flex justify-between items-end mb-4">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[#FF8400] text-[13px] font-medium">풀고 있는 중이에요</span>
+                            <span className="text-[13px] text-gray-500 font-medium">{progressPercent}%</span>
+                        </div>
+                        {quizpack.pendingXp !== null && quizpack.pendingXp !== undefined && (
+                            <div className="absolute right-5 bottom-4 flex items-baseline gap-1">
+                                <span className="text-[24px] text-[#FF8400] font-bold tracking-tight">
+                                    {quizpack.pendingXp > 0 ? `+${quizpack.pendingXp.toLocaleString('ko-KR')}` : quizpack.pendingXp.toLocaleString('ko-KR')}
+                                </span>
+                                <span className="text-[16px] text-[#2D2D2D] font-bold">
+                                    XP
+                                </span>
                             </div>
                         )}
                     </div>
                     {/* 진행 상황 바 */}
-                    <div className="flex items-center gap-3">
-                        <div className="flex-1 h-[8px] bg-gray-200 rounded-full overflow-hidden">
+                    <div className="flex items-center gap-3 pr-[90px]">
+                        <div className="flex-1 h-[12px] bg-gray-200 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-[#FF8400] transition-all duration-300 rounded-full"
                                 style={{ width: `${progressPercent}%` }}
                             />
                         </div>
-                        <span className="text-[13px] text-gray-500 font-medium min-w-[32px] text-right">
-                            {progressPercent}%
-                        </span>
                     </div>
                 </div>
             ) : (
@@ -157,11 +170,15 @@ export function QuizpackCard({ quizpack, onCompletedClick, onOpenedClick, isCurr
                         )}
                     </span>
 
-                    {/* 일반 상태 - 우측 별점 (대부분 완료 상태에서만 노출됨) */}
-                    {quizpack.status !== 'closed' && quizpack.status !== 'opened' && quizpack.averageRating !== null && Number(quizpack.averageRating) > 0 && (
-                        <div className="flex items-center text-gray-700">
-                            <Star className="w-[14px] h-[14px] mr-1 text-[#FF8400] fill-[#FF8400]" />
-                            {Number(quizpack.averageRating).toFixed(1)}
+                    {/* 일반 상태 - 우측 XP (완료 상태에서만 노출됨) */}
+                    {quizpack.status === 'completed' && quizpack.earnedXp !== null && quizpack.earnedXp > 0 && (
+                        <div className="absolute right-5 bottom-4 flex items-baseline gap-1">
+                            <span className="text-[24px] text-[#FF8400] font-bold tracking-tight">
+                                +{quizpack.earnedXp.toLocaleString('ko-KR')}
+                            </span>
+                            <span className="text-[16px] text-[#2D2D2D] font-bold">
+                                XP
+                            </span>
                         </div>
                     )}
                 </div>

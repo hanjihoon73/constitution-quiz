@@ -811,13 +811,26 @@ export async function getInProgressQuizpack(userId: number, excludePackId?: numb
 
 /**
  * 진행 중인 퀴즈팩을 중단하고 직전 상태로 복원합니다.
- * - 답변 기록이 있으면 → completed로 복원 + 답변 삭제
- * - 답변 기록이 없으면 → opened로 복원
+ * - completed_at이 존재하면 → 이전에 완료한 적 있음 → completed로 복원
+ * - completed_at이 없으면 → 처음 시작한 퀴즈팩 → opened로 복원
+ * (답변 기록은 어떤 경우든 삭제)
  */
 export async function abortInProgressQuizpack(userQuizpackId: number) {
     const supabase = createClient();
 
-    // 0. pending_xp 리셋 (XP 확정 전 중단이므로 임시 XP 초기화)
+    // 0. 현재 퀴즈팩 정보 조회 (completed_at 유무로 직전 상태 판단)
+    const { data: quizpack, error: fetchError } = await supabase
+        .from('user_quizpacks')
+        .select('id, completed_at')
+        .eq('id', userQuizpackId)
+        .single();
+
+    if (fetchError || !quizpack) {
+        console.error('[abortInProgressQuizpack] 퀴즈팩 조회 에러:', fetchError);
+        throw fetchError;
+    }
+
+    // 1. pending_xp 리셋 (XP 확정 전 중단이므로 임시 XP 초기화)
     const { error: xpResetError } = await supabase
         .from('user_quizpacks')
         .update({ pending_xp: 0 })
@@ -827,21 +840,17 @@ export async function abortInProgressQuizpack(userQuizpackId: number) {
         console.error('[abortInProgressQuizpack] pending_xp 리셋 에러:', xpResetError);
     }
 
-    // 1. 현재 세션에서 풀었던 답변이 있는지 확인
-    const { count: answerCount } = await supabase
+    // 2. 현재 세션의 답변 삭제 (어떤 경우든 삭제)
+    await supabase
         .from('user_quizzes')
-        .select('*', { count: 'exact', head: true })
+        .delete()
         .eq('user_quizpack_id', userQuizpackId);
 
-    if (answerCount && answerCount > 0) {
-        // 답변이 있으면 completed로 복원 (이전에 완료된 퀴즈팩을 다시 푼 경우)
-        // 현재 세션의 답변 삭제
-        await supabase
-            .from('user_quizzes')
-            .delete()
-            .eq('user_quizpack_id', userQuizpackId);
+    // 3. 직전 상태로 복원
+    const hadCompletedBefore = !!quizpack.completed_at;
 
-        // completed 상태로 복원
+    if (hadCompletedBefore) {
+        // 이전에 완료한 적 있는 퀴즈팩 → completed로 복원
         const { error } = await supabase
             .from('user_quizpacks')
             .update({
@@ -859,8 +868,9 @@ export async function abortInProgressQuizpack(userQuizpackId: number) {
             console.error('[abortInProgressQuizpack] completed 복원 에러:', error);
             throw error;
         }
+        console.log(`[abortInProgressQuizpack] id=${userQuizpackId}: completed_at 존재 → completed로 복원`);
     } else {
-        // 답변이 없으면 opened로 복원 (아직 아무것도 풀지 않은 경우)
+        // 처음 시작한 퀴즈팩 → opened로 복원
         const { error } = await supabase
             .from('user_quizpacks')
             .update({
@@ -876,6 +886,7 @@ export async function abortInProgressQuizpack(userQuizpackId: number) {
             console.error('[abortInProgressQuizpack] opened 복원 에러:', error);
             throw error;
         }
+        console.log(`[abortInProgressQuizpack] id=${userQuizpackId}: completed_at 없음 → opened로 복원`);
     }
 
     return true;

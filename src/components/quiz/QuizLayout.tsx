@@ -10,12 +10,52 @@ interface QuizLayoutProps {
     navigation?: ReactNode; // 네비게이션을 헤더와 묶기 위해 prop으로 분리
     onExit?: () => void;
     isViewMode?: boolean;   // 결과 보기 모드 여부
+    pendingXp?: number;     // 퀴즈 진행 중 누적되는 XP
+    isLastQuizCompleted?: boolean; // 마지막 퀴즈 정오답 확인 완료 여부
+    onComplete?: () => Promise<void>; // 마지막 퀴즈 완료 시 호출될 콜백
+}
+
+// ... 중간 생략 (QuizPendingXpBadge 컴포넌트) ...
+import { useCountUp } from '@/hooks/useCountUp';
+
+/**
+ * 퀴즈 진행 화면 XP 표시용 내부 컴포넌트
+ */
+function QuizPendingXpBadge({ xp }: { xp: number }) {
+    // 최초 마운트 시 초기 pendingXp 값을 기억합니다.
+    const initialXpRef = useRef(xp);
+    // xp가 처음 들어왔을 때 애니메이션을 방지하고 시작값을 설정합니다.
+    const count = useCountUp({
+        start: initialXpRef.current,
+        end: xp,
+        duration: 800,
+        delay: 300,
+    });
+
+    // 0보다 크면 +, 0보다 작으면 - (toLocaleString 시 자동으로 -가 붙음), 0이면 0
+    let countText = '0';
+    if (count > 0) {
+        countText = `+${count.toLocaleString('ko-KR')}`;
+    } else if (count < 0) {
+        countText = count.toLocaleString('ko-KR'); // -10 등 마이너스는 기본 포함됨
+    }
+
+    return (
+        <div className="flex items-baseline gap-1">
+            <span className="text-[20px] text-[#FF8400] font-bold tracking-tight">
+                {countText}
+            </span>
+            <span className="text-[14px] text-[#2D2D2D] font-bold">
+                XP
+            </span>
+        </div>
+    );
 }
 
 /**
  * 퀴즈 화면 전체 레이아웃
  */
-export function QuizLayout({ children, navigation, onExit, isViewMode }: QuizLayoutProps) {
+export function QuizLayout({ children, navigation, onExit, isViewMode, pendingXp, isLastQuizCompleted, onComplete }: QuizLayoutProps) {
     const router = useRouter();
     const [showExitDialog, setShowExitDialog] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -42,9 +82,12 @@ export function QuizLayout({ children, navigation, onExit, isViewMode }: QuizLay
         };
     }, []);
 
-    const handleExitClick = () => {
+    const handleExitClick = async () => {
         if (isViewMode) {
             router.push('/');
+        } else if (isLastQuizCompleted && onComplete) {
+            // 마지막 퀴즈까지 풀었다면 중단 팝업 없이 완료 처리 후 이동
+            await onComplete();
         } else {
             setShowExitDialog(true);
         }
@@ -104,6 +147,13 @@ export function QuizLayout({ children, navigation, onExit, isViewMode }: QuizLay
                             <polyline points="12 19 5 12 12 5"></polyline>
                         </svg>
                     </button>
+
+                    {/* 우측 XP 표시 (viewMode가 아니고 pendingXp가 주어졌을 때) */}
+                    <div style={{ marginLeft: 'auto' }}>
+                        {!isViewMode && pendingXp !== undefined && (
+                            <QuizPendingXpBadge xp={pendingXp} />
+                        )}
+                    </div>
                 </header>
 
                 {/* 네비게이션 영역 */}

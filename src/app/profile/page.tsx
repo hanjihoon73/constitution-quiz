@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth';
-import { MobileFrame } from '@/components/common';
-import { Header } from '@/components/common/Header';
+import { MobileFrame, Header, XpModal } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { WithdrawDialog } from '@/components/profile';
@@ -28,6 +27,7 @@ export default function ProfilePage() {
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [isFadingOut, setIsFadingOut] = useState(false);
     const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
+    const [isRendered, setIsRendered] = useState(false); // 페이지 렌더링 완료 후 XpModal 애니메이션 트리거용
 
     // 로그인 안 되어 있으면 로그인 페이지로
     useEffect(() => {
@@ -159,6 +159,15 @@ export default function ProfilePage() {
         }
     };
 
+    // 마이페이지 렌더링 완료 후 애니메이션 시작
+    useEffect(() => {
+        if (!isLoading && isDbUserLoaded) {
+            // 메인 UI가 fade-in(500ms) 되는 동안 대기했다가 모달 슬라이드-인 트리거
+            const timer = setTimeout(() => setIsRendered(true), 300);
+            return () => clearTimeout(timer);
+        }
+    }, [isLoading, isDbUserLoaded]);
+
     // 초기 인증 확인 및 DB유저 조회 1회가 안 끝났을 경우에만 로딩 표시
     if (isLoading || !isDbUserLoaded) {
         return (
@@ -174,6 +183,7 @@ export default function ProfilePage() {
     return (
         <MobileFrame>
             <Header />
+            {dbUser && <XpModal totalXp={dbUser.total_xp} isReady={isRendered} />}
             <main className={`flex-1 overflow-y-auto flex flex-col transition-opacity duration-300 ${isFadingOut ? 'opacity-0' : 'opacity-100'}`}>
                 {/* 뒤로가기 */}
                 <div className="px-4 pt-4">

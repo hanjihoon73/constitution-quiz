@@ -40,6 +40,7 @@ export default function QuizPage() {
         toggleHint,
         saveProgress,
         completeQuizPack,
+        pendingXp,
     } = useQuiz(packId, { isRestart });
 
     // 사운드 객체 사전 로딩용 레퍼런스
@@ -157,6 +158,9 @@ export default function QuizPage() {
         <QuizLayout
             onExit={handleExit}
             isViewMode={isViewMode}
+            pendingXp={pendingXp}
+            isLastQuizCompleted={isLastQuiz && hasAnswer}
+            onComplete={handleComplete}
             navigation={
                 <div key={`nav-${currentQuiz.id}`}>
                     <QuizNavigation

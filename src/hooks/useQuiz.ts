@@ -29,6 +29,7 @@ interface UseQuizState {
     comboCount: number;           // 연속 정답 카운트
     hintUsedMap: Set<number>;     // 힌트를 사용한 퀴즈 ID 집합
     sessionNumber: number;        // 현재 세션 번호 (1회차 판별용)
+    pendingXp: number;            // 누적 포인트
 }
 
 interface UseQuizReturn extends UseQuizState {
@@ -48,6 +49,7 @@ interface UseQuizReturn extends UseQuizState {
     isFirstQuiz: boolean;
     correctCount: number;
     incorrectCount: number;
+    pendingXp: number;
 }
 interface UseQuizOptions {
     isRestart?: boolean;  // 다시풀기 모드 - 이전 답변 복원 생략
@@ -70,6 +72,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
         comboCount: 0,
         hintUsedMap: new Set(),
         sessionNumber: 0,
+        pendingXp: 0,
     });
 
     const isLoadingRef = useRef(false);
@@ -99,6 +102,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                 let startIndex = 0;
                 let userQuizpackId: number | null = null;
                 let sessionNumber = 0;
+                let initialPendingXp = 0;
                 const restoredAnswers = new Map<number, UserAnswer>();
 
                 if (dbUser?.id) {
@@ -112,6 +116,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                     if (userQuizpackId) {
                         // 진행 상태 조회 (초기화 후 최신 상태)
                         const progress = await getUserQuizProgress(dbUser.id, packId);
+                        initialPendingXp = progress?.pending_xp || 0;
 
                         // 보기 셔플: session_number 기반으로 매 세션마다 다른 순서
                         sessionNumber = progress?.session_number || 1;
@@ -192,6 +197,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                     startTime: new Date(),
                     userQuizpackId,
                     sessionNumber: sessionNumber,
+                    pendingXp: initialPendingXp,
                 }));
             } catch (err) {
                 console.error('퀴즈 로드 에러:', err);
@@ -349,41 +355,40 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                 hintUsed
             ).catch(err => console.error('퀴즈 답변 저장 에러:', err));
 
-            // XP 처리 (1회차 퀴즈팩만)
-            if (state.sessionNumber === 1) {
-                const quizData = state.packData?.quizzes[state.currentIndex];
-                // XP 관련 값을 로컬 변수로 캡처 (closure 문제 방지)
-                const capturedUserQuizpackId = state.userQuizpackId;
-                const capturedUserId = dbUser.id;
-                const capturedIsLastQuiz = isLastQuiz;
-                const capturedDifficultyId = quizData?.difficultyId || 3;
+            // XP 처리 (모든 회차에서 XP 획득 가능)
+            const quizData = state.packData?.quizzes[state.currentIndex];
+            // XP 관련 값을 로컬 변수로 캡처 (closure 문제 방지)
+            const capturedUserQuizpackId = state.userQuizpackId;
+            const capturedUserId = dbUser.id;
+            const capturedIsLastQuiz = isLastQuiz;
+            const capturedDifficultyId = quizData?.difficultyId || 3;
 
-                if (quizData && capturedUserQuizpackId) {
-                    // 즉시 실행 async 함수로 비동기 체인 격리
-                    (async () => {
-                        try {
-                            const xpDelta = await calculateQuizXP(
-                                capturedDifficultyId,
-                                isCorrect,
-                                hintUsed,
-                                newComboCount
-                            );
-                            console.log(`[XP] 퀴즈 ${state.currentIndex + 1}: diffId=${capturedDifficultyId}, correct=${isCorrect}, hint=${hintUsed}, combo=${newComboCount}, xpDelta=${xpDelta}`);
+            if (quizData && capturedUserQuizpackId) {
+                // 즉시 실행 async 함수로 비동기 체인 격리
+                (async () => {
+                    try {
+                        const xpDelta = await calculateQuizXP(
+                            capturedDifficultyId,
+                            isCorrect,
+                            hintUsed,
+                            newComboCount
+                        );
+                        console.log(`[XP] 퀴즈 ${state.currentIndex + 1}: diffId=${capturedDifficultyId}, correct=${isCorrect}, hint=${hintUsed}, combo=${newComboCount}, xpDelta=${xpDelta}`);
 
-                            if (xpDelta !== 0) {
-                                await updatePendingXP(capturedUserQuizpackId, xpDelta);
-                            }
-
-                            // 마지막 퀴즈인 경우 XP 확정
-                            if (capturedIsLastQuiz) {
-                                await confirmQuizpackXP(capturedUserId, capturedUserQuizpackId);
-                                console.log('[XP] 퀴즈팩 XP 확정 완료');
-                            }
-                        } catch (err) {
-                            console.error('[XP] XP 처리 에러:', err);
+                        if (xpDelta !== 0) {
+                            await updatePendingXP(capturedUserQuizpackId, xpDelta);
+                            setState(prev => ({ ...prev, pendingXp: prev.pendingXp + xpDelta }));
                         }
-                    })();
-                }
+
+                        // 마지막 퀴즈인 경우 XP 확정
+                        if (capturedIsLastQuiz) {
+                            await confirmQuizpackXP(capturedUserId, capturedUserQuizpackId);
+                            console.log('[XP] 퀴즈팩 XP 확정 완료');
+                        }
+                    } catch (err) {
+                        console.error('[XP] XP 처리 에러:', err);
+                    }
+                })();
             }
         }
 

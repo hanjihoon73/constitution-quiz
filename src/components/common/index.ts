@@ -2,3 +2,4 @@
 export { MobileFrame } from './MobileFrame';
 export { Header } from './Header';
 export { Loading } from './Loading';
+export { XpModal } from './XpModal';
