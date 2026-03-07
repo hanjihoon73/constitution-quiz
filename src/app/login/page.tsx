@@ -68,6 +68,11 @@ export default function LoginPage() {
     return (
         <MobileFrame className={`bg-background text-foreground ${isLoading || isFadingOut ? 'opacity-0' : 'animate-in fade-in duration-500 opacity-100'}`}>
             <div className="flex flex-1 flex-col relative min-h-full">
+                {/* 우상단 버전 표시 */}
+                <div className="absolute top-4 right-4 z-10">
+                    <span className="text-sm text-gray-400">v 0.5</span>
+                </div>
+
                 {/* 메인 컨텐츠 영역 (중앙 정렬) */}
                 <div className="flex-1 flex flex-col items-center justify-center px-6">
                     {/* BI 로고 영역 */}
@@ -155,10 +160,26 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                {/* 저작권 문구 (하단 고정) */}
-                <p className="mb-8 text-center text-xs text-gray-400 animate-fade-in-up delay-700">
-                    ⓒ 2025 COGNITY. All rights reserved.
-                </p>
+                {/* 하단 영역 (CI 로고 + 저작권) */}
+                <div className="mb-8 flex flex-col items-center gap-2 animate-fade-in-up delay-700">
+                    <a
+                        href="https://cognity.framer.website/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="transition-opacity hover:opacity-80"
+                    >
+                        <Image
+                            src="/ci_cognity.svg"
+                            alt="COGNITY"
+                            width={110}
+                            height={22}
+                            className="object-contain w-auto h-auto max-h-[22px]"
+                        />
+                    </a>
+                    <p className="text-center text-xs text-gray-400">
+                        ⓒ 2025 COGNITY. All rights reserved.
+                    </p>
+                </div>
             </div>
         </MobileFrame>
     );

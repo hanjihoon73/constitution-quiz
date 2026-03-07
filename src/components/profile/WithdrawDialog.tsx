@@ -81,7 +81,7 @@ export function WithdrawDialog({
                         <br />
                         <br />
                         <span className="text-[12px] text-[#888888] font-base mt-4 block">
-                            ※ 회원 탈퇴 시 진행했던 모든 퀴즈팩과 퀴즈 기록은 즉시 삭제됩니다.
+                            ※ 회원 탈퇴 시 진행했던 모든 퀴즈팩과 퀴즈 기록, XP는 즉시 삭제됩니다.
                         </span>
                     </p>
                 </DialogHeader>

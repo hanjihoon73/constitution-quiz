@@ -84,7 +84,7 @@ export function XpModal({ totalXp, delay = 0, isReady = true }: XpModalProps) {
             backgroundColor: '#FF8400',
             border: '6px solid #2D2D2D',
             borderRadius: '9999px',
-            padding: '0px 20px',
+            padding: '0px 16px 0px 20px',
             width: 'max-content',
             boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.2)', // 좀 더 진하고 또렷한 드롭 섀도우
         }}>

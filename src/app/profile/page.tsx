@@ -185,14 +185,15 @@ export default function ProfilePage() {
             <Header />
             {dbUser && <XpModal totalXp={dbUser.total_xp} isReady={isRendered} />}
             <main className={`flex-1 overflow-y-auto flex flex-col transition-opacity duration-300 ${isFadingOut ? 'opacity-0' : 'opacity-100'}`}>
-                {/* 뒤로가기 */}
-                <div className="px-4 pt-4">
+                {/* 상단 컨트롤 (뒤로가기 & 버전) */}
+                <div className="px-4 pt-4 flex justify-between items-center">
                     <button
                         onClick={() => router.back()}
                         className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-transform duration-200 hover:-translate-y-0.5 active:scale-95 hover:text-gray-700 cursor-pointer"
                     >
                         <ArrowLeft size={24} />
                     </button>
+                    <span className="text-sm text-gray-400">v 0.5</span>
                 </div>
 
                 {/* 프로필 카드 */}
@@ -354,8 +355,21 @@ export default function ProfilePage() {
                     </a>
                 </div>
 
-                {/* 저작권 문구 */}
-                <div className="px-4 pb-12 flex justify-center mt-auto animate-in fade-in duration-500 delay-700 fill-mode-both">
+                {/* 하단 영역 (CI 로고 + 저작권) */}
+                <div className="px-4 pb-12 flex flex-col items-center gap-2 mt-auto animate-in fade-in duration-500 delay-700 fill-mode-both">
+                    <a
+                        href="https://cognity.framer.website/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="transition-opacity hover:opacity-80"
+                    >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src="/ci_cognity.svg"
+                            alt="COGNITY"
+                            style={{ width: '110px', height: '22px', objectFit: 'contain' }}
+                        />
+                    </a>
                     <p className="text-xs text-gray-400">
                         ⓒ 2025 COGNITY. All rights reserved.
                     </p>

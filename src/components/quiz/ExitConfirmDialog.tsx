@@ -38,7 +38,7 @@ export function ExitConfirmDialog({ isOpen, onClose, onConfirm }: ExitConfirmDia
                         퀴즈팩을 중단할까요?
                     </DialogTitle>
                     <p className="text-[#888888] text-[15px] font-medium leading-relaxed text-center">
-                        지금까지 풀었던 퀴즈는 저장됩니다.<br />
+                        지금까지 풀었던 퀴즈와 XP는 저장됩니다.<br />
                         나중에 이어서 풀 수 있어요.
                     </p>
                 </DialogHeader>
