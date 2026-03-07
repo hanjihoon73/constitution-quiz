@@ -85,19 +85,55 @@ export function QuizContent({
         }
     };
 
+    // 난이도 라벨
+    const getDifficultyLabel = () => {
+        switch (quiz.difficultyId) {
+            case 1:
+                return '하';
+            case 2:
+                return '중하';
+            case 3:
+                return '중';
+            case 4:
+                return '중상';
+            case 5:
+                return '상';
+            default:
+                return '알수없음';
+        }
+    };
+
     return (
         <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {/* 퀴즈 유형 라벨 */}
-            <div className="animate-fade-in-up delay-100">
+            {/* 상단 라벨 영역 (난이도 / 유형) */}
+            <div className="animate-fade-in-up delay-100 flex justify-start items-center gap-1" style={{ padding: '0 4px' }}>
+                {/* 난이도 배지 */}
+                {quiz.difficultyId && (
+                    <span
+                        style={{
+                            display: 'inline-block',
+                            padding: '4px 10px',
+                            backgroundColor: '#2D2D2D',
+                            color: '#FF8400',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                        }}
+                    >
+                        {getDifficultyLabel()}
+                    </span>
+                )}
+
+                {/* 유형 배지 */}
                 <span
                     style={{
                         display: 'inline-block',
-                        padding: '4px 10px',
-                        backgroundColor: '#E5E7EB',
-                        color: '#6B7280',
-                        borderRadius: '9999px',
+                        padding: '3px 8px', // 테두리 두께 1px 감안하여 패딩 1px 축소
+                        backgroundColor: '#e7e7e7ff',
+                        color: '#92969cff',
+                        borderRadius: '6px',
                         fontSize: '12px',
-                        fontWeight: 'bold',
+                        fontWeight: '600',
                     }}
                 >
                     {getQuizTypeLabel()}

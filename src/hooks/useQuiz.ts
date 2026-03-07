@@ -5,6 +5,7 @@ import { Quiz, QuizPackData, getQuizzesByPackId, saveQuizProgress, getUserQuizPr
 import { calculateQuizXP, updatePendingXP, confirmQuizpackXP } from '@/lib/api/xp';
 import { seededShuffle } from '@/lib/utils/seededShuffle';
 import { useAuth } from '@/components/auth';
+import { toast } from 'sonner';
 
 // 사용자의 답안 타입
 export interface UserAnswer {
@@ -467,11 +468,19 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
     const toggleHint = useCallback(() => {
         setState(prev => {
             const newState = { ...prev, showHint: !prev.showHint };
-            // 힌트를 처음 여는 경우에만 기록
+            // 힌트를 처음 여는 경우에만 기록하고 토스트 팝업 표시
             if (!prev.showHint && currentQuiz) {
-                const newHintUsedMap = new Set(prev.hintUsedMap);
-                newHintUsedMap.add(currentQuiz.id);
-                newState.hintUsedMap = newHintUsedMap;
+                if (!prev.hintUsedMap.has(currentQuiz.id)) {
+                    const newHintUsedMap = new Set(prev.hintUsedMap);
+                    newHintUsedMap.add(currentQuiz.id);
+                    newState.hintUsedMap = newHintUsedMap;
+
+                    // 첫 힌트 열람 시 XP 삭감 메시지 2초 팝업 (중복 방지를 위한 id 부여)
+                    toast.info('힌트 사용으로 획득 XP가 줄어듭니다.', {
+                        id: 'hint-xp-toast',
+                        duration: 2000
+                    });
+                }
             }
             return newState;
         });
