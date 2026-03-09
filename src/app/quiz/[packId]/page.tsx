@@ -41,6 +41,7 @@ export default function QuizPage() {
         saveProgress,
         completeQuizPack,
         pendingXp,
+        completedCount,
     } = useQuiz(packId, { isRestart });
 
     // 사운드 객체 사전 로딩용 레퍼런스
@@ -159,6 +160,7 @@ export default function QuizPage() {
             onExit={handleExit}
             isViewMode={isViewMode}
             pendingXp={pendingXp}
+            isXpDisabled={completedCount >= 2}
             isLastQuizCompleted={isLastQuiz && hasAnswer}
             onComplete={handleComplete}
             navigation={

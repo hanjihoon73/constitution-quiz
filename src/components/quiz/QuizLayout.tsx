@@ -11,6 +11,7 @@ interface QuizLayoutProps {
     onExit?: () => void;
     isViewMode?: boolean;   // 결과 보기 모드 여부
     pendingXp?: number;     // 퀴즈 진행 중 누적되는 XP
+    isXpDisabled?: boolean; // XP 비활성화 여부 (3회차 이후)
     isLastQuizCompleted?: boolean; // 마지막 퀴즈 정오답 확인 완료 여부
     onComplete?: () => Promise<void>; // 마지막 퀴즈 완료 시 호출될 콜백
 }
@@ -21,7 +22,7 @@ import { useCountUp } from '@/hooks/useCountUp';
 /**
  * 퀴즈 진행 화면 XP 표시용 내부 컴포넌트
  */
-function QuizPendingXpBadge({ xp }: { xp: number }) {
+function QuizPendingXpBadge({ xp, disabled = false }: { xp: number; disabled?: boolean }) {
     // 최초 마운트 시 초기 pendingXp 값을 기억합니다.
     const initialXpRef = useRef(xp);
     // xp가 처음 들어왔을 때 애니메이션을 방지하고 시작값을 설정합니다.
@@ -40,12 +41,16 @@ function QuizPendingXpBadge({ xp }: { xp: number }) {
         countText = count.toLocaleString('ko-KR'); // -10 등 마이너스는 기본 포함됨
     }
 
+    // 비활성화 시 회색으로 표시
+    const xpColor = disabled ? '#9CA3AF' : '#FF8400';
+    const labelColor = disabled ? '#9CA3AF' : '#2D2D2D';
+
     return (
         <div className="flex items-baseline gap-1">
-            <span className="text-[20px] text-[#FF8400] font-bold tracking-tight">
+            <span className="text-[20px] font-bold tracking-tight" style={{ color: xpColor }}>
                 {countText}
             </span>
-            <span className="text-[14px] text-[#2D2D2D] font-bold">
+            <span className="text-[14px] font-bold" style={{ color: labelColor }}>
                 XP
             </span>
         </div>
@@ -55,7 +60,7 @@ function QuizPendingXpBadge({ xp }: { xp: number }) {
 /**
  * 퀴즈 화면 전체 레이아웃
  */
-export function QuizLayout({ children, navigation, onExit, isViewMode, pendingXp, isLastQuizCompleted, onComplete }: QuizLayoutProps) {
+export function QuizLayout({ children, navigation, onExit, isViewMode, pendingXp, isXpDisabled, isLastQuizCompleted, onComplete }: QuizLayoutProps) {
     const router = useRouter();
     const [showExitDialog, setShowExitDialog] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -151,7 +156,7 @@ export function QuizLayout({ children, navigation, onExit, isViewMode, pendingXp
                     {/* 우측 XP 표시 (viewMode가 아니고 pendingXp가 주어졌을 때) */}
                     <div style={{ marginLeft: 'auto' }}>
                         {!isViewMode && pendingXp !== undefined && (
-                            <QuizPendingXpBadge xp={pendingXp} />
+                            <QuizPendingXpBadge xp={pendingXp} disabled={isXpDisabled} />
                         )}
                     </div>
                 </header>

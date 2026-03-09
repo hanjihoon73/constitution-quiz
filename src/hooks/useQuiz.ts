@@ -29,7 +29,8 @@ interface UseQuizState {
     // XP 관련 상태
     comboCount: number;           // 연속 정답 카운트
     hintUsedMap: Set<number>;     // 힌트를 사용한 퀴즈 ID 집합
-    sessionNumber: number;        // 현재 세션 번호 (1회차 판별용)
+    sessionNumber: number;        // 현재 세션 번호 (셔플 시드용)
+    completedCount: number;       // 퀴즈팩 완료 횟수 (XP 배율 계산용)
     pendingXp: number;            // 누적 포인트
 }
 
@@ -73,6 +74,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
         comboCount: 0,
         hintUsedMap: new Set(),
         sessionNumber: 0,
+        completedCount: 0,
         pendingXp: 0,
     });
 
@@ -103,6 +105,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                 let startIndex = 0;
                 let userQuizpackId: number | null = null;
                 let sessionNumber = 0;
+                let completedCount = 0;
                 let initialPendingXp = 0;
                 const restoredAnswers = new Map<number, UserAnswer>();
 
@@ -118,6 +121,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                         // 진행 상태 조회 (초기화 후 최신 상태)
                         const progress = await getUserQuizProgress(dbUser.id, packId);
                         initialPendingXp = progress?.pending_xp || 0;
+                        completedCount = progress?.completed_count || 0;
 
                         // 보기 셔플: session_number 기반으로 매 세션마다 다른 순서
                         sessionNumber = progress?.session_number || 1;
@@ -198,8 +202,17 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                     startTime: new Date(),
                     userQuizpackId,
                     sessionNumber: sessionNumber,
+                    completedCount: completedCount,
                     pendingXp: initialPendingXp,
                 }));
+
+                // 3회차 이후 (2회 이상 완료): XP 비활성화 토스트 표시
+                if (completedCount >= 2) {
+                    toast.info('두 번 이상 완료한 퀴즈팩은 XP를 획득할 수 없습니다.', {
+                        id: 'xp-disabled-toast',
+                        duration: 3000,
+                    });
+                }
             } catch (err) {
                 console.error('퀴즈 로드 에러:', err);
                 if (!cancelled) {
@@ -356,13 +369,14 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                 hintUsed
             ).catch(err => console.error('퀴즈 답변 저장 에러:', err));
 
-            // XP 처리 (모든 회차에서 XP 획득 가능)
+            // XP 처리 (completedCount 기반 차등 지급)
             const quizData = state.packData?.quizzes[state.currentIndex];
             // XP 관련 값을 로컬 변수로 캡처 (closure 문제 방지)
             const capturedUserQuizpackId = state.userQuizpackId;
             const capturedUserId = dbUser.id;
             const capturedIsLastQuiz = isLastQuiz;
             const capturedDifficultyId = quizData?.difficultyId || 3;
+            const capturedCompletedCount = state.completedCount;
 
             if (quizData && capturedUserQuizpackId) {
                 // 즉시 실행 async 함수로 비동기 체인 격리
@@ -372,9 +386,10 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                             capturedDifficultyId,
                             isCorrect,
                             hintUsed,
-                            newComboCount
+                            newComboCount,
+                            capturedCompletedCount
                         );
-                        console.log(`[XP] 퀴즈 ${state.currentIndex + 1}: diffId=${capturedDifficultyId}, correct=${isCorrect}, hint=${hintUsed}, combo=${newComboCount}, xpDelta=${xpDelta}`);
+                        console.log(`[XP] 퀴즈 ${state.currentIndex + 1}: diffId=${capturedDifficultyId}, correct=${isCorrect}, hint=${hintUsed}, combo=${newComboCount}, completedCount=${capturedCompletedCount}, xpDelta=${xpDelta}`);
 
                         if (xpDelta !== 0) {
                             await updatePendingXP(capturedUserQuizpackId, xpDelta);
@@ -394,7 +409,7 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
         }
 
         return isCorrect;
-    }, [currentQuiz, state.answers, state.hintUsedMap, state.comboCount, state.sessionNumber, state.packData, dbUser?.id, state.userQuizpackId, state.currentIndex, isLastQuiz]);
+    }, [currentQuiz, state.answers, state.hintUsedMap, state.comboCount, state.sessionNumber, state.completedCount, state.packData, dbUser?.id, state.userQuizpackId, state.currentIndex, isLastQuiz]);
 
     // 다음 퀴즈로 이동
     const goToNext = useCallback(() => {

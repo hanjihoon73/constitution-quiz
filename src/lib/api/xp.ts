@@ -45,14 +45,19 @@ export async function grantOnboardingXP(userId: number) {
  * @param isCorrect 정답 여부
  * @param hintUsed 힌트 사용 여부
  * @param comboCount 현재 연속 정답 카운트 (정답 처리 후의 값)
+ * @param completedCount 퀴즈팩 완료 횟수 (0=1회차, 1=2회차, 2+=3회차+)
  * @returns 이번 퀴즈로 인한 XP 변동량 (양수/음수/0)
  */
 export async function calculateQuizXP(
     difficultyId: number,
     isCorrect: boolean,
     hintUsed: boolean,
-    comboCount: number
+    comboCount: number,
+    completedCount: number = 0
 ): Promise<number> {
+    // 3회차 이후 (2회 이상 완료): XP 획득 불가
+    if (completedCount >= 2) return 0;
+
     const supabase = createClient();
 
     // 난이도별 XP 조회
@@ -82,6 +87,11 @@ export async function calculateQuizXP(
     // 3. 콤보 XP (2회 이상 연속 정답부터)
     if (isCorrect && comboCount >= 2) {
         xpDelta += 20;
+    }
+
+    // 4. 2회차 (1회 완료): 50% 적용 (반올림)
+    if (completedCount === 1) {
+        xpDelta = Math.round(xpDelta * 0.5);
     }
 
     return xpDelta;

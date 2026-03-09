@@ -127,7 +127,7 @@ export async function saveQuizProgress(
     // 기존 진행 기록 확인
     const { data: existing, error: checkError } = await supabase
         .from('user_quizpacks')
-        .select('id, session_number, status')
+        .select('id, session_number, status, completed_count')
         .eq('user_id', userId)
         .eq('quizpack_id', packId)
         .maybeSingle();
@@ -162,6 +162,7 @@ export async function saveQuizProgress(
         if (data.status === 'completed') {
             updateData.completed_at = new Date().toISOString();
             updateData.session_number = (existing.session_number || 0) + 1;
+            updateData.completed_count = ((existing as { completed_count?: number }).completed_count || 0) + 1;
         }
 
         if (data.totalTimeSeconds) {
