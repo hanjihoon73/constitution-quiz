@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { MobileFrame } from '@/components/common';
 import { useAuth } from '@/components/auth';
 import { getUserQuizProgress, updateQuizpackStatistics, saveQuizpackRating, unlockNextQuizpack, getUserQuizpackId, resetUserQuizpack } from '@/lib/api/quiz';
-import { Star, Clock, ArrowLeft, CircleCheckBig, SearchCheck } from 'lucide-react';
+import { Star, Clock, ArrowLeft, PartyPopper, SearchCheck } from 'lucide-react';
 import { useConfetti } from '@/hooks/useConfetti';
 
 interface QuizResult {
@@ -267,13 +267,8 @@ export default function QuizCompletePage() {
                 flexDirection: 'column',
                 alignItems: 'center'
             }}>
-                <div style={{ marginBottom: '16px', position: 'relative', display: 'inline-block' }}>
-                    <CircleCheckBig size={90} strokeWidth={1.5} color="#FF8400" />
-                    {result?.completedCount && result.completedCount > 0 ? (
-                        <div className="absolute right-0 bottom-0 translate-x-[15%] translate-y-[15%] flex items-center justify-center w-[32px] h-[32px] rounded-full border-[2.5px] border-[#FF8400] bg-[#2D2D2D] text-[#FF8400] font-bold text-[15px]">
-                            {result.completedCount}
-                        </div>
-                    ) : null}
+                <div style={{ marginBottom: '16px', color: '#FF8400' }}>
+                    <PartyPopper size={100} strokeWidth={1.5} />
                 </div>
                 <h1 style={{
                     fontSize: '24px',
@@ -400,14 +395,14 @@ export default function QuizCompletePage() {
                 </div>
                 {/* 획득 XP */}
                 <div style={{ textAlign: 'center', flex: 1 }}>
-                    <div style={{ 
-                        fontSize: '36px', 
-                        fontWeight: 'bold', 
-                        color: result?.completedCount && result.completedCount >= 3 ? '#9CA3AF' : '#FF8400', 
-                        marginBottom: '4px', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center' 
+                    <div style={{
+                        fontSize: '36px',
+                        fontWeight: 'bold',
+                        color: result?.completedCount && result.completedCount >= 3 ? '#9CA3AF' : '#FF8400',
+                        marginBottom: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}>
                         <span style={{ fontSize: '36px', marginRight: '2px' }}>
                             {Math.round(xpRate) > 0 ? '+' : Math.round(xpRate) < 0 ? '-' : ''}

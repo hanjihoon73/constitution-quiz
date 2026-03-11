@@ -121,15 +121,17 @@ export function QuizLayout({ children, navigation, onExit, isViewMode, pendingXp
                     transition: 'box-shadow 0.2s ease-in-out, border-bottom 0.2s ease-in-out',
                 }}
             >
-                {/* 헤더 */}
                 <header
                     style={{
                         padding: '16px 20px 10px 20px',
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'space-between',
                     }}
                 >
-                    <button
+                    {/* 좌측: 나가기 버튼 및 회차 표시 */}
+                    <div className="flex items-center gap-2">
+                        <button
                         onClick={handleExitClick}
                         style={{
                             display: 'flex',
@@ -154,17 +156,18 @@ export function QuizLayout({ children, navigation, onExit, isViewMode, pendingXp
                         </svg>
                     </button>
 
-                    {/* 우측 진행 회차 및 XP 표시 */}
-                    <div className="flex items-center gap-2 ml-auto">
-                        {!isViewMode && completedCount !== undefined && (
-                            <span className="text-[12px] font-bold text-[#FF8400] bg-[#FFF3E6] px-2 py-[2px] rounded-full border border-[#FFD6A5]">
-                                {completedCount + 1}회차
-                            </span>
-                        )}
-                        {!isViewMode && pendingXp !== undefined && (
-                            <QuizPendingXpBadge xp={pendingXp} disabled={isXpDisabled} />
-                        )}
+                    {/* 우측: 진행 회차 표시 (나가기 버튼 옆) */}
+                    {!isViewMode && completedCount !== undefined && (
+                        <span className="text-[12px] font-bold text-[#FF8400] bg-[#FFF3E6] px-2 py-[2px] rounded-full border border-[#FFD6A5]">
+                            {completedCount + 1}회차
+                        </span>
+                    )}
                     </div>
+
+                    {/* 우측: XP 표시 */}
+                    {!isViewMode && pendingXp !== undefined && (
+                        <QuizPendingXpBadge xp={pendingXp} disabled={isXpDisabled} />
+                    )}
                 </header>
 
                 {/* 네비게이션 영역 */}

@@ -128,7 +128,7 @@ export function QuizContent({
                 <span
                     style={{
                         display: 'inline-block',
-                        padding: '3px 8px', // 테두리 두께 1px 감안하여 패딩 1px 축소
+                        padding: '4px 10px', // 테두리 두께 1px 감안하여 패딩 1px 축소
                         backgroundColor: '#e7e7e7ff',
                         color: '#92969cff',
                         borderRadius: '6px',
