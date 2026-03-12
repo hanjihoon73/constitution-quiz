@@ -505,6 +505,8 @@ export type Database = {
                     provider: Database["public"]["Enums"]["auth_provider"]
                     provider_id: string
                     role: Database["public"]["Enums"]["user_role"] | null
+                    title: string | null
+                    title_code: string | null
                     total_xp: number
                     weekly_xp: number
                 }
@@ -517,6 +519,8 @@ export type Database = {
                     provider: Database["public"]["Enums"]["auth_provider"]
                     provider_id: string
                     role?: Database["public"]["Enums"]["user_role"] | null
+                    title?: string | null
+                    title_code?: string | null
                     total_xp?: number
                     weekly_xp?: number
                 }
@@ -529,6 +533,8 @@ export type Database = {
                     provider?: Database["public"]["Enums"]["auth_provider"]
                     provider_id?: string
                     role?: Database["public"]["Enums"]["user_role"] | null
+                    title?: string | null
+                    title_code?: string | null
                     total_xp?: number
                     weekly_xp?: number
                 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth';
-import { MobileFrame, Header, XpModal } from '@/components/common';
+import { MobileFrame, Header } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { WithdrawDialog } from '@/components/profile';
@@ -183,7 +183,6 @@ export default function ProfilePage() {
     return (
         <MobileFrame>
             <Header />
-            {dbUser && <XpModal totalXp={dbUser.total_xp} isReady={isRendered} />}
             <main className={`flex-1 overflow-y-auto flex flex-col transition-opacity duration-300 ${isFadingOut ? 'opacity-0' : 'opacity-100'}`}>
                 {/* 상단 컨트롤 (뒤로가기 & 버전) */}
                 <div className="px-4 pt-4 flex justify-between items-center">
@@ -201,9 +200,34 @@ export default function ProfilePage() {
                     <div className="bg-white rounded-2xl border border-gray-200 p-6">
                         {/* 프로필 아이콘 + 닉네임 */}
                         <div className="flex flex-col items-center gap-4">
-                            <div className="w-24 h-24 rounded-full flex items-center justify-center" style={{ backgroundColor: '#ecececff' }}>
-                                <CircleUser className="w-18 h-18" color="#2D2D2D" strokeWidth={1.8} />
+                            {/* 프로필 이미지 아이콘 영역 */}
+                            <div className="relative flex flex-col items-center">
+                                {/* 직급 뱃지 (우측 상단) */}
+                                {dbUser?.title_code && (
+                                    <div className="absolute -right-1 -top-1 w-10 h-10 z-10 flex items-center justify-center bg-gray-200 rounded-full shadow-sm border border-gray-100">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={`/${dbUser.title_code}.svg`}
+                                            alt={dbUser.title || '직급 뱃지'}
+                                            className="w-6 h-6 object-contain"
+                                        />
+                                    </div>
+                                )}
+
+                                <div className="w-28 h-28 rounded-full flex items-center justify-center relative" style={{ backgroundColor: '#ecececff' }}>
+                                    <CircleUser className="w-20 h-20 text-[#2D2D2D]" strokeWidth={1.8} />
+                                </div>
+
+                                {/* 타이틀(직급) 캡슐 (하단 겹침) */}
+                                {dbUser?.title && (
+                                    <div className="absolute -bottom-4 z-10 px-2 py-0.5 min-w-[90px] bg-[#2D2D2D] rounded-full flex items-center justify-center">
+                                        <span className="text-white text-[14px] font-medium tracking-wide">{dbUser.title}</span>
+                                    </div>
+                                )}
                             </div>
+
+                            {/* 닉네임 수정 폼과의 간격 확보 */}
+                            <div className="mt-0" />
 
                             {/* 닉네임 영역 */}
                             {isEditingNickname ? (

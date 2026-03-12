@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { MobileFrame, Header, XpModal } from '@/components/common';
+import { MobileFrame, Header } from '@/components/common';
 import { QuizpackList, WelcomeDialog, ExitConfirmDialog } from '@/components/home';
 import { useAuth } from '@/components/auth';
 import { useQuizpacks } from '@/hooks/useQuizpacks';
@@ -251,9 +251,6 @@ function HomeContent() {
   return (
     <MobileFrame className="animate-in fade-in duration-500">
       <Header />
-
-      {/* XP 보유 현황 모달 */}
-      {dbUser && <XpModal totalXp={dbUser.total_xp} isReady={!authLoading && !quizpacksLoading} />}
 
       {/* 퀴즈팩 목록 (전체 화면 스크롤) */}
       <main className="pb-10 pt-2">

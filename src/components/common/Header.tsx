@@ -4,6 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { CircleUser, Share } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/components/auth';
+import { XpModal } from '@/components/common/XpModal';
 
 interface HeaderProps {
     showProfile?: boolean;
@@ -15,6 +17,8 @@ interface HeaderProps {
  * - 프로필 아이콘 (클릭 시 마이페이지로 이동)
  */
 export function Header({ showProfile = true }: HeaderProps) {
+    const { dbUser, isLoading, isDbUserLoaded } = useAuth();
+
     const handleShare = async () => {
         const shareData = {
             title: '모두의 헌법',
@@ -55,8 +59,15 @@ export function Header({ showProfile = true }: HeaderProps) {
                     />
                 </Link>
 
-                {/* 우측 영역 */}
+                {/* 우측 영역 (XP, 공유, 프로필) */}
                 <div className="flex items-center gap-1">
+                    {/* XP 모달 (로그인 된 경우만 표시) */}
+                    {dbUser && (
+                        <div className="mr-2">
+                            <XpModal totalXp={dbUser.total_xp} isReady={!isLoading && isDbUserLoaded} />
+                        </div>
+                    )}
+
                     {/* 공유 아이콘 */}
                     <button
                         onClick={handleShare}
