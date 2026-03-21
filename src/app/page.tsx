@@ -10,6 +10,10 @@ import { useQuizpacks } from '@/hooks/useQuizpacks';
 import { AllClearDialog } from '@/components/quiz/AllClearDialog';
 import { RestartOptionDialog } from '@/components/quiz/RestartOptionDialog';
 import { AbortConfirmDialog } from '@/components/quiz/AbortConfirmDialog';
+import { LeagueFloatingButton } from '@/components/league/LeagueFloatingButton';
+import { LeagueEndPopup } from '@/components/league/LeagueEndPopup';
+import { LeagueStartPopup } from '@/components/league/LeagueStartPopup';
+import { useLeaguePopup } from '@/hooks/useLeaguePopup';
 import {
   resetUserQuizpack,
   getUserQuizpackId,
@@ -37,6 +41,7 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const { user, dbUser, isLoading: authLoading, isDbUserLoaded } = useAuth();
   const { quizpacks, isLoading: quizpacksLoading, error } = useQuizpacks();
+  const league = useLeaguePopup();
 
   const [showAllClearDialog, setShowAllClearDialog] = useState(false);
   const [showWelcomeDialog, setShowWelcomeDialog] = useState(false);
@@ -252,8 +257,9 @@ function HomeContent() {
     <MobileFrame className="animate-in fade-in duration-500">
       <Header />
 
-      {/* 퀴즈팩 목록 (전체 화면 스크롤) */}
-      <main className="pb-10 pt-2">
+      {/* 퀴즈팩 목록 (MobileFrame 내부 스크롤) */}
+      <main className="flex-1 overflow-y-auto pb-10 pt-2">
+
         <QuizpackList
           quizpacks={quizpacks}
           isLoading={authLoading || quizpacksLoading}
@@ -297,6 +303,31 @@ function HomeContent() {
         onConfirm={handleExitConfirm}
         isLoggingOut={isLoggingOut}
       />
+
+      {/* 리그 플로팅 버튼 */}
+      <LeagueFloatingButton />
+
+      {/* 리그 종료 팝업 */}
+      {league.showEndPopup && (
+        <LeagueEndPopup
+          open={league.showEndPopup}
+          onClose={league.closeEndPopup}
+          rank={league.endRank}
+          nickname={dbUser?.nickname || ''}
+          weekStartDate={league.lastWeekStartDate}
+          weekEndDate={league.weekStartDate}
+        />
+      )}
+
+      {/* 리그 시작 팝업 */}
+      {league.showStartPopup && (
+        <LeagueStartPopup
+          open={league.showStartPopup}
+          onClose={league.closeStartPopup}
+          weekStartDate={league.weekStartDate}
+          weekEndDate={league.weekEndDate}
+        />
+      )}
     </MobileFrame>
   );
 }

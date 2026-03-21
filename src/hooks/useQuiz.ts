@@ -396,10 +396,19 @@ export function useQuiz(packId: number, options: UseQuizOptions = {}): UseQuizRe
                             setState(prev => ({ ...prev, pendingXp: prev.pendingXp + xpDelta }));
                         }
 
-                        // 마지막 퀴즈인 경우 XP 확정
+                        // 마지막 퀴즈인 경우 XP 확정 (정답 수 및 총 문제 수도 함께 전달 → 누적 정답률 갱신)
                         if (capturedIsLastQuiz) {
-                            await confirmQuizpackXP(capturedUserId, capturedUserQuizpackId);
-                            console.log('[XP] 퀴즈팩 XP 확정 완료');
+                            const totalQ = state.packData?.quizzes.length || 0;
+                            // state.answers는 아직 마지막 퀴즈 isCorrect가 반영 전이므로
+                            // 이전 정답 수 + 마지막 퀴즈 정답 여부로 최종값 계산
+                            let prevCorrectCount = 0;
+                            state.answers.forEach(a => { if (a.isCorrect) prevCorrectCount++; });
+                            const finalCorrect = prevCorrectCount + (isCorrect ? 1 : 0);
+                            await confirmQuizpackXP(capturedUserId, capturedUserQuizpackId, {
+                                correctCount: finalCorrect,
+                                totalQuizCount: totalQ,
+                            });
+                            console.log('[XP] 퀴즈팩 XP 확정 완료 (정답률 갱신 포함)');
                         }
                     } catch (err) {
                         console.error('[XP] XP 처리 에러:', err);

@@ -12,16 +12,17 @@ interface MobileFrameProps {
  * - 최대 480px 너비
  * - PC에서 중앙 정렬 + 그림자
  * - 모바일에서 전체 너비
+ * - h-[100dvh] (고정 높이): flex-1 overflow-y-auto 자식이 올바르게 내부 스크롤되도록
  */
 export function MobileFrame({ children, className = '' }: MobileFrameProps) {
     return (
-        <div className="min-h-[100dvh] bg-muted/20 flex justify-center">
+        <div className="h-[100dvh] bg-muted/20 flex justify-center">
             <div
                 className={`
                     mobile-frame
                     w-full
                     max-w-[480px] 
-                    min-h-[100dvh] 
+                    h-[100dvh]
                     bg-background 
                     text-foreground
                     relative
@@ -36,3 +37,4 @@ export function MobileFrame({ children, className = '' }: MobileFrameProps) {
         </div>
     );
 }
+

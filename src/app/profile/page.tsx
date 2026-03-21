@@ -9,7 +9,12 @@ import { Input } from '@/components/ui/input';
 import { WithdrawDialog } from '@/components/profile';
 import { updateNickname, checkNicknameDuplicate } from '@/lib/api/user';
 import { toast } from 'sonner';
-import { ArrowLeft, Pencil, Check, X, LogOut, CircleUser } from 'lucide-react';
+import { ArrowLeft, Pencil, Check, X, CircleUser } from 'lucide-react';
+
+import { LeagueFloatingButton } from '@/components/league/LeagueFloatingButton';
+import { LeagueEndPopup } from '@/components/league/LeagueEndPopup';
+import { LeagueStartPopup } from '@/components/league/LeagueStartPopup';
+import { useLeaguePopup } from '@/hooks/useLeaguePopup';
 
 // 닉네임 유효성 검사 정규식 (2-10자, 한글/영문/숫자만)
 const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9]{2,10}$/;
@@ -17,6 +22,7 @@ const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9]{2,10}$/;
 export default function ProfilePage() {
     const router = useRouter();
     const { user, dbUser, isLoading, isDbUserLoaded, signOut, refreshDbUser } = useAuth();
+    const league = useLeaguePopup();
 
     const [isEditingNickname, setIsEditingNickname] = useState(false);
     const [newNickname, setNewNickname] = useState('');
@@ -408,6 +414,31 @@ export default function ProfilePage() {
                 userId={dbUser?.id || 0}
                 authId={user?.id || ''}
             />
+
+            {/* 리그 플로팅 버튼 */}
+            <LeagueFloatingButton />
+
+            {/* 리그 종료 팝업 */}
+            {league.showEndPopup && (
+                <LeagueEndPopup
+                    open={league.showEndPopup}
+                    onClose={league.closeEndPopup}
+                    rank={league.endRank}
+                    nickname={dbUser?.nickname || ''}
+                    weekStartDate={league.lastWeekStartDate}
+                    weekEndDate={league.weekStartDate}
+                />
+            )}
+
+            {/* 리그 시작 팝업 */}
+            {league.showStartPopup && (
+                <LeagueStartPopup
+                    open={league.showStartPopup}
+                    onClose={league.closeStartPopup}
+                    weekStartDate={league.weekStartDate}
+                    weekEndDate={league.weekEndDate}
+                />
+            )}
         </MobileFrame>
     );
 }

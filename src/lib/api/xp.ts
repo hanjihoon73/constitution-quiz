@@ -117,18 +117,25 @@ export async function updatePendingXP(userQuizpackId: number, xpDelta: number) {
 }
 
 /**
- * 퀴즈팩 완료 시 XP를 확정합니다.
+ * 퀴즈팩 완료 시 XP를 확정하고 주간 리그 통계를 업데이트합니다.
  * - users.total_xp += pending_xp
  * - users.weekly_xp += pending_xp
+ * - users.weekly_unique_packs_count: 최초 완료 시 +1
+ * - users.weekly_total_packs_count: 항상 +1
+ * - users.total_correct_answers, total_quiz_attempts, quizpack_avrg_correct 업데이트
  * - users_xp_history에 quizpack_complete 레코드 추가
  */
-export async function confirmQuizpackXP(userId: number, userQuizpackId: number) {
+export async function confirmQuizpackXP(
+    userId: number,
+    userQuizpackId: number,
+    quizResult?: { correctCount: number; totalQuizCount: number } // 정답률 갱신용
+) {
     const supabase = createClient();
 
-    // 1. pending_xp 조회
+    // 1. pending_xp + 완료 횟수 조회
     const { data: quizpack, error: selectError } = await supabase
         .from('user_quizpacks')
-        .select('pending_xp')
+        .select('pending_xp, completed_count')
         .eq('id', userQuizpackId)
         .single();
 
@@ -138,35 +145,56 @@ export async function confirmQuizpackXP(userId: number, userQuizpackId: number) 
     }
 
     const pendingXP = quizpack.pending_xp || 0;
-    if (pendingXP === 0) return;
+    const completedCount = quizpack.completed_count || 0; // 확정 전 기존 완료 횟수
+    const isFirstCompletion = completedCount === 0; // 이번이 첫 완료인지 여부
 
-    // 2. 현재 사용자 XP 조회
+    // 2. 현재 사용자 통계 조회
     const { data: user, error: userError } = await supabase
         .from('users')
-        .select('total_xp, weekly_xp')
+        .select('total_xp, weekly_xp, weekly_unique_packs_count, weekly_total_packs_count, total_correct_answers, total_quiz_attempts')
         .eq('id', userId)
         .single();
 
     if (userError || !user) {
-        console.error('[confirmQuizpackXP] 사용자 XP 조회 에러:', userError);
+        console.error('[confirmQuizpackXP] 사용자 통계 조회 에러:', userError);
         return;
     }
 
-    // 3. users.total_xp, weekly_xp 업데이트
+    // 3. 정답률 관련 누적 계산
+    const prevCorrect = user.total_correct_answers || 0;
+    const prevAttempts = user.total_quiz_attempts || 0;
+    const newCorrect = prevCorrect + (quizResult?.correctCount ?? 0);
+    const newAttempts = prevAttempts + (quizResult?.totalQuizCount ?? 0);
+    const newAvgCorrect = newAttempts > 0 ? Math.round((newCorrect / newAttempts) * 1000) / 10 : 0; // 소수점 1자리
+
+    // 4. users 통계 업데이트
+    const updatePayload: Record<string, unknown> = {
+        total_xp: (user.total_xp || 0) + pendingXP,
+        weekly_xp: (user.weekly_xp || 0) + pendingXP,
+        weekly_total_packs_count: (user.weekly_total_packs_count || 0) + 1,
+        total_correct_answers: newCorrect,
+        total_quiz_attempts: newAttempts,
+        quizpack_avrg_correct: newAvgCorrect,
+    };
+
+    // 첫 완료인 경우에만 고유 팩 수 증가
+    if (isFirstCompletion) {
+        updatePayload.weekly_unique_packs_count = (user.weekly_unique_packs_count || 0) + 1;
+    }
+
     const { error: updateError } = await supabase
         .from('users')
-        .update({
-            total_xp: (user.total_xp || 0) + pendingXP,
-            weekly_xp: (user.weekly_xp || 0) + pendingXP,
-        })
+        .update(updatePayload)
         .eq('id', userId);
 
     if (updateError) {
-        console.error('[confirmQuizpackXP] XP 업데이트 에러:', updateError);
+        console.error('[confirmQuizpackXP] XP/통계 업데이트 에러:', updateError);
         return;
     }
 
-    // 4. XP 히스토리 기록
+    if (pendingXP === 0) return; // XP가 0이면 히스토리 기록 불필요
+
+    // 5. XP 히스토리 기록
     const { error: historyError } = await supabase
         .from('users_xp_history')
         .insert({
@@ -182,7 +210,7 @@ export async function confirmQuizpackXP(userId: number, userQuizpackId: number) 
         console.error('[confirmQuizpackXP] XP 히스토리 기록 에러:', historyError);
     }
 
-    // 5. earned_xp에 확정 XP 복사 + pending_xp 리셋
+    // 6. earned_xp에 확정 XP 복사 + pending_xp 리셋
     const { error: quizpackUpdateError } = await supabase
         .from('user_quizpacks')
         .update({
@@ -233,19 +261,17 @@ export async function getUserXPHistory(userId: number) {
 }
 
 /**
- * 전체 사용자의 weekly_xp를 0으로 리셋합니다. (주간 리그 리셋용)
- * 리그 시스템 구현 시 pg_cron 또는 Edge Function에서 호출합니다.
+ * 주간 리그 리셋 함수 (pg_cron 또는 Edge Function에서 호출)
+ * - 이전 주 랭킹을 users_ranking_history에 스냅샷 저장
+ * - weekly_xp, weekly_unique_packs_count, weekly_total_packs_count 초기화
  */
-export async function resetWeeklyXP() {
+export async function resetWeeklyLeague() {
     const supabase = createClient();
 
-    const { error } = await supabase
-        .from('users')
-        .update({ weekly_xp: 0 })
-        .gt('weekly_xp', 0);
+    const { error } = await supabase.rpc('reset_weekly_league');
 
     if (error) {
-        console.error('[resetWeeklyXP] 주간 XP 리셋 에러:', error);
+        console.error('[resetWeeklyLeague] 주간 리그 리셋 에러:', error);
         throw error;
     }
 }
