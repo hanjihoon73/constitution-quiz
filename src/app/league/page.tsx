@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth';
 import { MobileFrame, Header } from '@/components/common';
@@ -48,9 +48,20 @@ interface RankItemProps {
 function RankItem({ item, animationDelay }: RankItemProps) {
     const rankStyle = getRankStyle(item.rank);
     const isMe = item.isMe;
+    const itemRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (isMe && itemRef.current) {
+            const timer = setTimeout(() => {
+                itemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [isMe]);
 
     return (
         <div
+            ref={itemRef}
             className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both"
             style={{ animationDelay: `${animationDelay}ms`, animationDuration: '350ms' }}
         >
@@ -253,7 +264,7 @@ export default function LeaguePage() {
                             <Trophy className="w-12 h-12 text-gray-200" strokeWidth={1.5} />
                             <p className="text-[14px] text-gray-400 text-center">
                                 아직 이번 주 리그 참여자가 없습니다.<br />
-                                퀴즈팩을 완료하고 첫 번째 랭커가 되세요!
+                                가장 먼저 퀴즈팩을 완료하고 1위에 등극하세요!
                             </p>
                         </div>
                     ) : (
