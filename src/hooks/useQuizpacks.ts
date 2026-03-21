@@ -42,7 +42,9 @@ export function useQuizpacks(): UseQuizpacksReturn {
         try {
             const data = await getQuizpacksWithStatus(dbUser.id);
             setQuizpacks(data);
-        } catch (err) {
+        } catch (err: any) {
+            // 페이지 전환/새로고침 시 Next.js가 정상적으로 중단시키는 fetch → 조용히 무시
+            if (err?.name === 'AbortError') return;
             console.error('퀴즈팩 조회 에러:', err);
             setError(err instanceof Error ? err : new Error('퀴즈팩을 불러오는데 실패했습니다.'));
         } finally {

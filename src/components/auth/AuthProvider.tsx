@@ -27,14 +27,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const supabase = createClient();
 
-    // DB에서 사용자 정보 조회 및 auth_id 업데이트
     const fetchDbUser = async (authUser: User) => {
         // 1. 먼저 provider_id로 사용자 조회
-        const { data } = await supabase
+        const { data, error } = await supabase
             .from('users')
             .select('*')
             .eq('provider_id', authUser.id)
             .single();
+
+        // 에러가 발생했는데, "데이터가 없다(PGRST116)"는 에러가 아닌 네트워크/타임아웃 등에러라면
+        // 유저가 진짜 없는 게 아니라 통신 실패이므로 dbUser를 null로 덮어쓰지 않고 무시합니다.
+        if (error && error.code !== 'PGRST116') {
+            console.error('[AuthProvider] fetchDbUser 에러 (네트워크/타임아웃 등):', error);
+            setIsDbUserLoaded(true);
+            return;
+        }
 
         if (data) {
             // 2. auth_id가 없거나 다르면 업데이트 (RLS 정책 호환성)
@@ -50,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setDbUser(data);
             }
         } else {
+            // 진짜 데이터가 없는 경우에만 null 처리 (= 신규 유저 온보딩 대상)
             setDbUser(null);
         }
         setIsDbUserLoaded(true); // dbUser 조회가 끝났음을 갱신

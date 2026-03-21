@@ -162,7 +162,9 @@ export default function LeaguePage() {
         try {
             const data = await getWeeklyRanking(dbUser.id);
             setRankings(data);
-        } catch (err) {
+        } catch (err: any) {
+            // 페이지 새로고침/언마운트 시 Next.js가 fetch를 정상적으로 중단시키는 경우 → 조용히 무시
+            if (err?.name === 'AbortError') return;
             console.error('[LeaguePage] 랭킹 조회 에러:', err);
         } finally {
             setIsLoading(false);

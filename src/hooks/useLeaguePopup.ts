@@ -71,36 +71,42 @@ export function useLeaguePopup(): LeaguePopupState {
         if (!isDbUserLoaded || !dbUser?.id) return;
 
         const init = async () => {
-            const endWeekKey = lastWeekStart.replace(/-/g, '');
-            const startWeekKey = weekStart.replace(/-/g, '');
+            try {
+                const endWeekKey = lastWeekStart.replace(/-/g, '');
+                const startWeekKey = weekStart.replace(/-/g, '');
 
-            const endSeen = getCookieValue(`league_end_seen_${endWeekKey}`);
-            const startSeen = getCookieValue(`league_start_seen_${startWeekKey}`);
+                const endSeen = getCookieValue(`league_end_seen_${endWeekKey}`);
+                const startSeen = getCookieValue(`league_start_seen_${startWeekKey}`);
 
-            // 1. 리그 종료 팝업 체크 (지난주 데이터가 있고, 아직 안 봤으면)
-            if (!endSeen) {
-                const lastRanking = await getLastWeekRanking(dbUser.id);
-                if (lastRanking && lastRanking.weekStartDate === lastWeekStart) {
-                    setEndRank(lastRanking.rank);
-                    setShowEndPopup(true);
+                // 1. 리그 종료 팝업 체크 (지난주 데이터가 있고, 아직 안 봤으면)
+                if (!endSeen) {
+                    const lastRanking = await getLastWeekRanking(dbUser.id);
+                    if (lastRanking && lastRanking.weekStartDate === lastWeekStart) {
+                        setEndRank(lastRanking.rank);
+                        setShowEndPopup(true);
 
-                    // 시작 팝업은 종료 팝업을 닫은 후에 보여줌 (pendingShowStart)
-                    if (!startSeen) {
-                        const participated = await checkLeagueParticipation(dbUser.id);
-                        if (participated) {
-                            setPendingShowStart(true);
+                        // 시작 팝업은 종료 팝업을 닫은 후에 보여줌 (pendingShowStart)
+                        if (!startSeen) {
+                            const participated = await checkLeagueParticipation(dbUser.id);
+                            if (participated) {
+                                setPendingShowStart(true);
+                            }
                         }
+                        return; // 종료 팝업이 있으면 시작 팝업은 나중에
                     }
-                    return; // 종료 팝업이 있으면 시작 팝업은 나중에
                 }
-            }
 
-            // 2. 리그 시작 안내 팝업 체크 (이번 주 참여했고, 아직 안 봤으면)
-            if (!startSeen) {
-                const participated = await checkLeagueParticipation(dbUser.id);
-                if (participated) {
-                    setShowStartPopup(true);
+                // 2. 리그 시작 안내 팝업 체크 (이번 주 참여했고, 아직 안 봤으면)
+                if (!startSeen) {
+                    const participated = await checkLeagueParticipation(dbUser.id);
+                    if (participated) {
+                        setShowStartPopup(true);
+                    }
                 }
+            } catch (err: any) {
+                // 페이지 전환/새로고침 시 Next.js가 정상적으로 중단시키는 fetch → 조용히 무시
+                if (err?.name === 'AbortError') return;
+                console.error('[useLeaguePopup] 팝업 초기화 에러:', err);
             }
         };
 
