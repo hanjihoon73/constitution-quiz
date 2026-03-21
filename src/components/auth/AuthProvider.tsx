@@ -28,39 +28,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const supabase = createClient();
 
     const fetchDbUser = async (authUser: User) => {
-        // 1. 먼저 provider_id로 사용자 조회
-        const { data, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('provider_id', authUser.id)
-            .single();
+        try {
+            // 1. 먼저 provider_id로 사용자 조회
+            const { data, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('provider_id', authUser.id)
+                .single();
 
-        // 에러가 발생했는데, "데이터가 없다(PGRST116)"는 에러가 아닌 네트워크/타임아웃 등에러라면
-        // 유저가 진짜 없는 게 아니라 통신 실패이므로 dbUser를 null로 덮어쓰지 않고 무시합니다.
-        if (error && error.code !== 'PGRST116') {
-            console.error('[AuthProvider] fetchDbUser 에러 (네트워크/타임아웃 등):', error);
-            setIsDbUserLoaded(true);
-            return;
-        }
-
-        if (data) {
-            // 2. auth_id가 없거나 다르면 업데이트 (RLS 정책 호환성)
-            if (data.auth_id !== authUser.id) {
-                await supabase
-                    .from('users')
-                    .update({ auth_id: authUser.id })
-                    .eq('id', data.id);
-
-                // 업데이트된 데이터로 설정
-                setDbUser({ ...data, auth_id: authUser.id });
-            } else {
-                setDbUser(data);
+            if (error) {
+                // PGRST116 = "Row not found" → 진짜로 DB에 없는 유저 (신규 → 온보딩 대상)
+                if (error.code === 'PGRST116') {
+                    setDbUser(null);
+                    setIsDbUserLoaded(true);
+                    return;
+                }
+                // 그 외 에러(네트워크, 타임아웃, 탭 동기화 AbortError 등)는 무시
+                // → 기존에 로드된 dbUser가 있으면 그대로 유지
+                return;
             }
-        } else {
-            // 진짜 데이터가 없는 경우에만 null 처리 (= 신규 유저 온보딩 대상)
-            setDbUser(null);
+
+            if (data) {
+                // 2. auth_id가 없거나 다르면 업데이트 (RLS 정책 호환성)
+                if (data.auth_id !== authUser.id) {
+                    await supabase
+                        .from('users')
+                        .update({ auth_id: authUser.id })
+                        .eq('id', data.id);
+
+                    setDbUser({ ...data, auth_id: authUser.id });
+                } else {
+                    setDbUser(data);
+                }
+            } else {
+                setDbUser(null);
+            }
+            setIsDbUserLoaded(true);
+        } catch {
+            // fetch 자체가 AbortError 등으로 실패한 경우 → 조용히 무시
+            // 기존 dbUser가 있으면 유지됨 (null로 덮어쓰지 않음)
         }
-        setIsDbUserLoaded(true); // dbUser 조회가 끝났음을 갱신
     };
 
     // DB 사용자 정보 새로고침
@@ -89,20 +96,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         // 초기 세션 확인 (최초 1회만 실행되어 isLoading 해제 담당)
         const initializeAuth = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
 
-            setSession(session);
-            setUser(session?.user ?? null);
+                setSession(session);
+                setUser(session?.user ?? null);
 
-            if (session?.user) {
-                await fetchDbUser(session.user);
-            } else {
-                // 세션 없으면 isDbUserLoaded도 완료로 설정 (비로그인 상태)
-                setIsDbUserLoaded(true);
+                if (session?.user) {
+                    await fetchDbUser(session.user);
+                } else {
+                    // 세션 없으면 isDbUserLoaded도 완료로 설정 (비로그인 상태)
+                    setIsDbUserLoaded(true);
+                }
+
+                isInitialized.current = true;
+                setIsLoading(false);
+            } catch {
+                // React StrictMode 더블 마운트 또는 페이지 전환 시 발생하는
+                // AbortError → 개발 환경 전용 현상이므로 조용히 무시
             }
-
-            isInitialized.current = true;
-            setIsLoading(false);
         };
 
         initializeAuth();

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리그 테스트 도구 (Standalone)</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f3f4f6;
+            display: flex; justify-content: center;
+            min-height: 100dvh;
+        }
+        .container {
+            width: 100%; max-width: 480px;
+            background: #fff;
+            padding: 24px 16px;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .header {
+            display: flex; align-items: center; gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .header h1 { font-size: 20px; font-weight: 700; color: #111827; }
+        .header p { font-size: 13px; color: #6b7280; margin-top: 2px; }
+        .card {
+            background: #fff; padding: 20px;
+            border-radius: 16px; border: 1px solid #f0f0f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .card-title {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 12px;
+        }
+        .card-title .icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .card-title h2 { font-size: 15px; font-weight: 600; color: #111827; }
+        .card-desc { font-size: 12px; color: #9ca3af; margin-bottom: 14px; padding-left: 46px; }
+        .btn-group { display: flex; flex-direction: column; gap: 8px; padding-left: 46px; }
+        button {
+            width: 100%; padding: 10px 16px;
+            border-radius: 8px; border: none;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.15s;
+        }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button:active:not(:disabled) { transform: scale(0.98); }
+        .btn-blue { background: #3b82f6; color: #fff; }
+        .btn-blue:hover:not(:disabled) { background: #2563eb; }
+        .btn-purple { background: #8b5cf6; color: #fff; }
+        .btn-purple:hover:not(:disabled) { background: #7c3aed; }
+        .btn-red-outline {
+            background: transparent; color: #ef4444;
+            border: 1px solid #fecaca;
+        }
+        .btn-red-outline:hover:not(:disabled) { background: #fef2f2; }
+        .btn-amber { background: #f59e0b; color: #fff; }
+        .btn-amber:hover:not(:disabled) { background: #d97706; }
+        .btn-gray { background: #6b7280; color: #fff; }
+        .btn-gray:hover:not(:disabled) { background: #4b5563; }
+        .btn-emerald { background: #10b981; color: #fff; }
+        .btn-emerald:hover:not(:disabled) { background: #059669; }
+        .toast {
+            position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+            padding: 12px 20px; border-radius: 10px;
+            font-size: 14px; font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 999; opacity: 0; transition: opacity 0.3s;
+            max-width: 400px; text-align: center;
+        }
+        .toast.success { background: #10b981; color: #fff; }
+        .toast.error { background: #ef4444; color: #fff; }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>🏆 리그 테스트 도구</h1>
+                <p>주간 리그 테스트 전용 · Next.js 비연동 독립 페이지</p>
+            </div>
+        </div>
+
+        <!-- 1. 더미 유저 관리 -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:#dbeafe;color:#2563eb;">👥</div>
+                <h2>1. 테스트 유저 목록 제어</h2>
+            </div>
+            <p class="card-desc">is_test=true 인 더미 데이터 20건을 users 테이블에 즉시 생성합니다.</p>
+            <div class="btn-group">
+                <button class="btn-blue" onclick="callRPC('create_dummy_league_users', '더미 유저 20명을 성공적으로 생성했습니다.')">
+                    더미 유저 20명 생성
+                </button>
+                <button class="btn-red-outline" onclick="callRPC('delete_dummy_league_users', '더미 유저 목록을 일괄 삭제했습니다.')">
+                    🗑️ 더미 유저 일괄 삭제
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. 통계 조작 -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:#ede9fe;color:#7c3aed;">🔄</div>
+                <h2>2. 테스트 리그 데이터 시뮬레이션</h2>
+            </div>
+            <p class="card-desc">생성된 더미 유저들의 XP, 완료 수, 정답률 데이터를 무작위로 변경합니다.</p>
+            <div class="btn-group">
+                <button class="btn-purple" onclick="callRPC('randomize_dummy_league_scores', '더미 유저들의 랭킹 데이터가 랜덤 갱신되었습니다.')">
+                    더미 랭킹 데이터 랜덤 갱신
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. 주간 리그 리셋 -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:#fef3c7;color:#d97706;">📅</div>
+                <h2>3. 주간 리그 강제 리셋</h2>
+            </div>
+            <p class="card-desc">pg_cron이 월요일 0시에 수행하는 리셋 로직을 수동 실행합니다.</p>
+            <div class="btn-group">
+                <button class="btn-amber" onclick="callRPC('reset_weekly_league', '주간 리그 리셋이 완료되었습니다.')">
+                    주간 리그 강제 리셋
+                </button>
+            </div>
+        </div>
+
+        <!-- 4. 팝업 쿠키 초기화 -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:#e5e7eb;color:#4b5563;">🍪</div>
+                <h2>4. 팝업 노출 쿠키 초기화</h2>
+            </div>
+            <p class="card-desc">리그 종료/시작 안내 팝업의 "이미 봤음" 쿠키를 삭제합니다.</p>
+            <div class="btn-group">
+                <button class="btn-gray" onclick="clearCookies()">
+                    팝업 쿠키 전체 삭제
+                </button>
+            </div>
+        </div>
+
+        <!-- 5. 서비스 바로가기 -->
+        <div class="card">
+            <div class="card-title">
+                <div class="icon" style="background:#d1fae5;color:#059669;">🏠</div>
+                <h2>5. 서비스 페이지 바로가기</h2>
+            </div>
+            <div class="btn-group">
+                <button class="btn-emerald" onclick="window.open('/', '_blank')">
+                    🏆 홈 페이지 (새 탭)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Supabase 클라이언트 초기화 (인증 세션 없이 anon key만 사용)
+        const SUPABASE_URL = 'https://oawyhlmquuutqfuewaoc.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hd3lobG1xdXV1dHFmdWV3YW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2MjY3ODMsImV4cCI6MjA4NDIwMjc4M30.8Fs11w-_AF50-JqMqC6N9fLMpiRL49N9JxWzTVC6hc4';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                // 인증 세션을 아예 사용하지 않음 → 서비스 탭과 토큰 충돌 원천 차단
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false,
+            }
+        });
+
+        let isLoading = false;
+
+        function setLoading(loading) {
+            isLoading = loading;
+            document.querySelectorAll('button').forEach(btn => btn.disabled = loading);
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.className = 'toast', 3000);
+        }
+
+        async function callRPC(funcName, successMsg) {
+            if (isLoading) return;
+            setLoading(true);
+            try {
+                const { error } = await supabase.rpc(funcName);
+                if (error) throw error;
+                showToast(successMsg, 'success');
+            } catch (err) {
+                showToast(`실패: ${err.message || JSON.stringify(err)}`, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function clearCookies() {
+            const cookies = document.cookie.split(';');
+            for (const cookie of cookies) {
+                const name = cookie.split('=')[0].trim();
+                document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+            }
+            showToast('팝업 노출 쿠키가 모두 삭제되었습니다.', 'success');
+        }
+    </script>
+</body>
+</html>
