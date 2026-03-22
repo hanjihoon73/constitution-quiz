@@ -53,8 +53,11 @@ export function XpModal({ totalXp, delay = 0, isReady = true }: XpModalProps) {
 
     if (!mounted) return null; // Hydration mismatch 방지
 
-    // 천단위 콤마 포맷
-    const formattedCount = count.toLocaleString('ko-KR');
+    // K, M, B 축약 포맷 (예: 1.5K, 3.6M)
+    const formattedCount = Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        maximumFractionDigits: 2,
+    }).format(count);
 
     // 헤더 통합형 XP 뱃지 스타일 (애니메이션 제거)
     return (
@@ -76,12 +79,11 @@ export function XpModal({ totalXp, delay = 0, isReady = true }: XpModalProps) {
                 color: '#2D2D2D',
                 fontWeight: '600',
                 fontSize: '12px',
-                fontFamily: 'sans-serif',
                 marginRight: '6px',
             }}>
                 XP
             </span>
-            <span className="text-[18px] text-white font-[600] tracking-tight font-mono">
+            <span className="text-[16px] text-white font-[600] tracking-tight">
                 {formattedCount}
             </span>
         </div>
