@@ -93,8 +93,8 @@ function RankItem({ item, animationDelay }: RankItemProps) {
     };
 
     const formatXp = (xp: number) => {
-        if (xp >= 1000) return (xp / 1000).toFixed(2).replace(/\.00$/, '') + 'K';
-        return xp.toLocaleString('ko-KR');
+        if (xp >= 1000) return { value: (xp / 1000).toFixed(2), unit: 'K' };
+        return { value: xp.toLocaleString('ko-KR'), unit: '' };
     };
 
     return (
@@ -173,8 +173,16 @@ function RankItem({ item, animationDelay }: RankItemProps) {
                     <span className="text-[16px] font-bold text-[#FF8400]">
                         {item.weeklyXp.toLocaleString('ko-KR')} XP
                     </span>
-                    <span className="text-[10px] text-gray-400 font-medium">
-                        누적 XP {formatXp(item.totalXp)}
+                    <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap">
+                        누적 XP {(() => {
+                            const { value, unit } = formatXp(item.totalXp);
+                            return (
+                                <>
+                                    {value}
+                                    {unit && <span className="ml-[1px] font-bold text-[9px] translate-y-[-0.5px] inline-block">{unit}</span>}
+                                </>
+                            );
+                        })()}
                     </span>
                 </div>
             </div>

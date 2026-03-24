@@ -56,8 +56,14 @@ export function XpModal({ totalXp, delay = 0, isReady = true }: XpModalProps) {
     // K, M, B 축약 포맷 (예: 1.5K, 3.6M)
     const formattedCount = Intl.NumberFormat('en-US', {
         notation: 'compact',
+        minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     }).format(count);
+
+    // 숫자와 단위(K, M 등)를 분리
+    const match = formattedCount.match(/^([0-9.]+)([A-Z])?$/);
+    const numberPart = match ? match[1] : formattedCount;
+    const unitPart = match ? match[2] : '';
 
     // 헤더 통합형 XP 뱃지 스타일 (애니메이션 제거)
     return (
@@ -84,7 +90,8 @@ export function XpModal({ totalXp, delay = 0, isReady = true }: XpModalProps) {
                 XP
             </span>
             <span className="text-[16px] text-white font-[600] tracking-tight">
-                {formattedCount}
+                {numberPart}
+                {unitPart && <span className="ml-[2px]">{unitPart}</span>}
             </span>
         </div>
     );
