@@ -251,7 +251,7 @@ export default function LeaguePage() {
                     {/* 상단 컨트롤 */}
                     <div className="px-4 pt-4 flex justify-between items-center bg-background">
                         <button
-                            onClick={() => router.back()}
+                            onClick={() => router.push('/')}
                             className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-transform duration-200 hover:-translate-y-0.5 active:scale-95 hover:text-gray-700 cursor-pointer"
                         >
                             <ArrowLeft size={24} />
