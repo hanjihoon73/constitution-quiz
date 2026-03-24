@@ -69,8 +69,8 @@ export default function LoginPage() {
         <MobileFrame className={`bg-background text-foreground ${isLoading || isFadingOut ? 'opacity-0' : 'animate-in fade-in duration-500 opacity-100'}`}>
             <div className="flex flex-1 flex-col relative min-h-full">
                 {/* 우상단 버전 표시 */}
-                <div className="absolute top-4 right-4 z-10">
-                    <span className="text-sm text-gray-400">v 0.5</span>
+                <div className="absolute top-4 right-6 z-10">
+                    <span className="text-sm text-gray-400">v 1.0</span>
                 </div>
 
                 {/* 메인 컨텐츠 영역 (중앙 정렬) */}

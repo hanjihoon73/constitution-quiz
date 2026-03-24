@@ -191,14 +191,14 @@ export default function ProfilePage() {
             <Header />
             <main className={`flex-1 overflow-y-auto flex flex-col transition-opacity duration-300 ${isFadingOut ? 'opacity-0' : 'opacity-100'}`}>
                 {/* 상단 컨트롤 (뒤로가기 & 버전) */}
-                <div className="px-4 pt-4 flex justify-between items-center">
+                <div className="pl-4 pr-[20px] pt-4 flex justify-between items-center">
                     <button
                         onClick={() => router.push('/')}
                         className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-transform duration-200 hover:-translate-y-0.5 active:scale-95 hover:text-gray-700 cursor-pointer"
                     >
                         <ArrowLeft size={24} />
                     </button>
-                    <span className="text-sm text-gray-400">v 0.5</span>
+                    <span className="text-sm text-gray-400">v 1.0</span>
                 </div>
 
                 {/* 프로필 카드 */}
