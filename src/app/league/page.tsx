@@ -36,12 +36,13 @@ function getCurrentWeekLabel(): string {
 interface RankItemProps {
     item: WeeklyRankingItem;
     animationDelay: number;
+    isOpen: boolean;
+    onToggle: () => void;
 }
 
-function RankItem({ item, animationDelay }: RankItemProps) {
+function RankItem({ item, animationDelay, isOpen, onToggle }: RankItemProps) {
     const isMe = item.isMe;
     const itemRef = useRef<HTMLDivElement>(null);
-    const [showTooltip, setShowTooltip] = useState(false);
 
     useEffect(() => {
         if (isMe && itemRef.current) {
@@ -100,13 +101,11 @@ function RankItem({ item, animationDelay }: RankItemProps) {
     return (
         <div
             ref={itemRef}
-            className={`animate-in fade-in slide-in-from-bottom-2 fill-mode-both relative ${showTooltip ? 'z-[100]' : 'z-0'}`}
+            className={`animate-in fade-in slide-in-from-bottom-2 fill-mode-both relative ${isOpen ? 'z-[100]' : 'z-0'}`}
             style={{ animationDelay: `${animationDelay}ms`, animationDuration: '350ms' }}
-            onMouseEnter={() => setShowTooltip(true)}
-            onMouseLeave={() => setShowTooltip(false)}
         >
             {/* 툴팁 UI */}
-            {showTooltip && (
+            {isOpen && (
                 <div
                     className="absolute -top-[35px] right-6 z-50 animate-in fade-in zoom-in-95 duration-200"
                 >
@@ -136,7 +135,7 @@ function RankItem({ item, animationDelay }: RankItemProps) {
             )}
 
             <div
-                onClick={() => setShowTooltip(!showTooltip)}
+                onClick={onToggle}
                 className={`flex items-center gap-4 px-4 py-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer ${isMe ? 'shadow-sm' : ''}`}
                 style={{
                     backgroundColor: isMe ? '#FFF8F1' : '#ffffff',
@@ -195,6 +194,7 @@ export default function LeaguePage() {
     const { dbUser, isDbUserLoaded } = useAuth();
 
     const [rankings, setRankings] = useState<WeeklyRankingItem[]>([]);
+    const [openTooltipId, setOpenTooltipId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [weekLabel, setWeekLabel] = useState('');
@@ -332,6 +332,8 @@ export default function LeaguePage() {
                                     key={item.userId}
                                     item={item}
                                     animationDelay={idx * 50}
+                                    isOpen={openTooltipId === item.userId}
+                                    onToggle={() => setOpenTooltipId(openTooltipId === item.userId ? null : item.userId)}
                                 />
                             ))
                         )}
@@ -360,6 +362,8 @@ export default function LeaguePage() {
                                 key={item.userId}
                                 item={item}
                                 animationDelay={(top3Items.length + idx) * 50}
+                                isOpen={openTooltipId === item.userId}
+                                onToggle={() => setOpenTooltipId(openTooltipId === item.userId ? null : item.userId)}
                             />
                         ))
                     )}
