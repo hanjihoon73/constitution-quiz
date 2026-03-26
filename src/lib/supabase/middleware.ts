@@ -53,6 +53,27 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url);
     }
 
+    // 어드민 경로 특별 권한 관리
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+        if (!user) {
+            const url = request.nextUrl.clone();
+            url.pathname = '/login';
+            return NextResponse.redirect(url);
+        }
+
+        const { data: userData } = await supabase
+            .from('users')
+            .select('role')
+            .eq('auth_id', user.id)
+            .single();
+
+        if (!userData || userData.role !== 'admin') {
+            const url = request.nextUrl.clone();
+            url.pathname = '/';
+            return NextResponse.redirect(url);
+        }
+    }
+
     // 로그인한 사용자가 로그인 페이지에 접근
     if (user && request.nextUrl.pathname === '/login') {
         const url = request.nextUrl.clone();

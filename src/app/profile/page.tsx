@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { WithdrawDialog } from '@/components/profile';
 import { updateNickname, checkNicknameDuplicate } from '@/lib/api/user';
 import { toast } from 'sonner';
-import { ArrowLeft, Pencil, Check, X, CircleUser } from 'lucide-react';
+import { ArrowLeft, Pencil, Check, X, CircleUser, Settings2 } from 'lucide-react';
 
 import { LeagueFloatingButton } from '@/components/league/LeagueFloatingButton';
 import { LeagueEndPopup } from '@/components/league/LeagueEndPopup';
@@ -168,11 +168,12 @@ export default function ProfilePage() {
     // 마이페이지 렌더링 완료 후 애니메이션 시작
     useEffect(() => {
         if (!isLoading && isDbUserLoaded) {
+            console.log('[ProfilePage] Current dbUser role:', dbUser?.role);
             // 메인 UI가 fade-in(500ms) 되는 동안 대기했다가 모달 슬라이드-인 트리거
             const timer = setTimeout(() => setIsRendered(true), 300);
             return () => clearTimeout(timer);
         }
-    }, [isLoading, isDbUserLoaded]);
+    }, [isLoading, isDbUserLoaded, dbUser]);
 
     // 초기 인증 확인 및 DB유저 조회 1회가 안 끝났을 경우에만 로딩 표시
     if (isLoading || !isDbUserLoaded) {
@@ -203,7 +204,19 @@ export default function ProfilePage() {
 
                 {/* 프로필 카드 */}
                 <div className="px-4 pt-6 pb-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both">
-                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                    <div className="bg-white rounded-2xl border border-gray-200 p-6 relative">
+                        {/* 관리자 바로가기 버튼 */}
+                        {dbUser?.role === 'admin' && (
+                            <button
+                                onClick={() => router.push('/admin')}
+                                className="absolute right-4 top-4 p-2 rounded-xl bg-slate-100 text-slate-500 hover:text-indigo-600 hover:bg-slate-200 transition-all active:scale-95 group z-50 animate-in fade-in zoom-in duration-300"
+                                title="어드민 페이지로 이동"
+                                type="button"
+                            >
+                                <Settings2 size={20} className="group-hover:rotate-45 transition-transform duration-300" />
+                            </button>
+                        )}
+
                         {/* 프로필 아이콘 + 닉네임 */}
                         <div className="flex flex-col items-center gap-4">
                             {/* 프로필 이미지 아이콘 영역 */}
