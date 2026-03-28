@@ -238,7 +238,7 @@ export function UserEditModal({ user, open, onClose, onSuccess }: UserEditModalP
                         disabled={!canSave || loading}
                         className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white font-bold px-8"
                     >
-                        {loading ? '저장 중...' : '저장하기'}
+                        {loading ? '저장 중...' : '저장'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

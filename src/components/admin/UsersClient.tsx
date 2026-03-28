@@ -160,7 +160,7 @@ export function UsersClient({ initialUsers, total }: UsersClientProps) {
     }, [initialUsers, search, providerFilter, roleFilter, activeFilter, testFilter, sortKey, sortOrder]);
 
     return (
-        <div className="flex flex-col h-full gap-4">
+        <div className="flex flex-col h-full gap-4 min-h-0">
             {/* 검색 + 필터 한 행 — 고정 영역 */}
             <div className="bg-slate-900/50 rounded-2xl border border-slate-800 p-5 shrink-0">
                 <div className="flex flex-wrap gap-6 items-end">

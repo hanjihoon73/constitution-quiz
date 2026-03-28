@@ -16,7 +16,7 @@ export default function AdminLayout({
                         <span className="text-white">Dashboard</span>
                     </div>
                 </header>
-                <div className="flex-1 overflow-hidden flex flex-col p-8">
+                <div className="flex-1 overflow-hidden flex flex-col p-8 min-h-0">
                     {children}
                 </div>
             </main>

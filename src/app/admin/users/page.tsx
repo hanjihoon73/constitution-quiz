@@ -5,7 +5,7 @@ export default async function AdminUsersPage() {
     const { users, total } = await getAdminUsers();
 
     return (
-        <div className="h-full flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="h-full flex flex-col gap-6 min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* 고정 영역: 타이틀 */}
             <div className="shrink-0">
                 <h2 className="text-3xl font-bold text-white tracking-tight">사용자 관리</h2>
