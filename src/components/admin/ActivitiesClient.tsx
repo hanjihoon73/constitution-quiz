@@ -17,7 +17,7 @@ type SortOrder = 'asc' | 'desc';
 
 export function ActivitiesClient({ initialActivities, total }: ActivitiesClientProps) {
     const [search, setSearch] = useState('');
-    
+
     // Default 정렬: 누적 XP 기준 내림차순
     const [sortKey, setSortKey] = useState<SortKey>('total_xp');
     const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -101,10 +101,10 @@ export function ActivitiesClient({ initialActivities, total }: ActivitiesClientP
 
                     {/* 집계 카운터 */}
                     <div className="ml-auto space-y-1.5 text-right">
-                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">통계 집계 대상</p>
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">사용자 수</p>
                         <p className="text-sm text-slate-400">
-                            <span className="text-white font-bold">{filtered.length}</span> 명 / {' '}
-                            <span className="text-indigo-400 font-bold">{total}</span> 명
+                            <span className="text-gray-400 font-bold">{filtered.length}</span> / {' '}
+                            <span className="text-indigo-400 font-bold">{total}</span>
                         </p>
                     </div>
                 </div>
@@ -135,16 +135,16 @@ export function ActivitiesClient({ initialActivities, total }: ActivitiesClientP
                                     주간 랭킹 <SortIcon col="weekly_ranking" />
                                 </th>
                                 <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right w-24 whitespace-nowrap">
-                                    퀴즈 (문항)
+                                    퀴즈 개수
                                 </th>
                                 <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right w-24 whitespace-nowrap">
-                                    정답
+                                    정답 개수
                                 </th>
                                 <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right w-24 whitespace-nowrap">
-                                    정답률
+                                    평균 정답률
                                 </th>
                                 <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right w-40 whitespace-nowrap">
-                                    완료 (팩개수/횟수)
+                                    완료팩개수 / 팩완료횟수
                                 </th>
                                 <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right w-36 whitespace-nowrap">
                                     마지막 로그인

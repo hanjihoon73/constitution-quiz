@@ -232,10 +232,13 @@ export function UsersClient({ initialUsers, total }: UsersClientProps) {
                     )}
 
                     {/* 사용자 수 카운터 — 우측 끝 하단 정렬 */}
-                    <p className="ml-auto self-end text-sm text-slate-400 text-right">
-                        <span className="text-gray-400 font-bold">{filtered.length}</span> / {' '}
-                        <span className="text-indigo-400 font-bold">{total}</span>
-                    </p>
+                    <div className="ml-auto space-y-1.5 text-right">
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">사용자 수</p>
+                        <p className="text-sm text-slate-400">
+                            <span className="text-gray-400 font-bold">{filtered.length}</span> / {' '}
+                            <span className="text-indigo-400 font-bold">{total}</span>
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -302,7 +305,7 @@ function UserTableRow({ user }: { user: any }) {
                         'px-2 py-0.5 rounded-full text-[11px] font-bold border capitalize',
                         user.provider === 'kakao'
                             ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
-                            : 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                            : 'bg-red-500/10 text-red-500 border-red-500/20'
                     )}>
                         {user.provider || 'Email'}
                     </span>
@@ -333,10 +336,12 @@ function UserTableRow({ user }: { user: any }) {
                 {/* 활성화 */}
                 <td className="px-4 py-3.5">
                     <span className={cn(
-                        'px-2 py-0.5 rounded text-[11px] font-bold',
-                        user.is_active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
+                        'px-2.5 py-1 rounded-full text-[11px] font-bold border',
+                        user.is_active 
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                            : 'bg-slate-800/50 text-slate-400 border-slate-700/50'
                     )}>
-                        {user.is_active ? 'On' : 'Off'}
+                        {user.is_active ? 'ON' : 'OFF'}
                     </span>
                 </td>
 
