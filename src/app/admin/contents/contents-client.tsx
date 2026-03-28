@@ -71,7 +71,7 @@ export function ContentsClient({ quizpacks }: ContentsClientProps) {
             <div className="shrink-0 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-slate-400 text-sm bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-800">
                     <AlertCircle className="w-4 h-4 text-indigo-400" />
-                    <span>상/하 버튼으로 순서를 조정한 후 저장하세요.</span>
+                    <span>퀴즈팩의 상/하 버튼으로 순서를 조정할 수 있습니다.</span>
                 </div>
 
                 {isModified && (

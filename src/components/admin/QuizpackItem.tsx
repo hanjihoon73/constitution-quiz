@@ -18,7 +18,22 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { getAdminQuizzes, updateQuizpack } from '@/actions/admin/contents';
 import { QuizPreviewModal } from './QuizPreviewModal';
+import { QuizDetailModal } from './QuizDetailModal';
 import { toast } from 'sonner';
+
+const DIFFICULTY_LABELS: Record<number, string> = {
+    1: '하',
+    2: '중하',
+    3: '중',
+    4: '중상',
+    5: '상'
+};
+
+const QUIZ_TYPE_LABELS: Record<string, string> = {
+    'multiple': '선다',
+    'truefalse': 'OX',
+    'choiceblank': '빈칸채우기'
+};
 
 interface QuizpackItemProps {
     quizpack: any;
@@ -37,6 +52,7 @@ export function QuizpackItem({ quizpack, orderInfo }: QuizpackItemProps) {
     const [quizzes, setQuizzes] = useState<any[]>([]);
     const [loadingQuizzes, setLoadingQuizzes] = useState(false);
     const [previewQuizId, setPreviewQuizId] = useState<number | null>(null);
+    const [editQuizId, setEditQuizId] = useState<number | null>(null);
 
     // 수정 모드
     const [isEditing, setIsEditing] = useState(false);
@@ -95,20 +111,24 @@ export function QuizpackItem({ quizpack, orderInfo }: QuizpackItemProps) {
         }
     };
 
+    const loadQuizzes = async () => {
+        setLoadingQuizzes(true);
+        try {
+            const data = await getAdminQuizzes(quizpack.id);
+            setQuizzes(data);
+        } catch {
+            toast.error('퀴즈 목록을 불러오지 못했습니다.');
+        } finally {
+            setLoadingQuizzes(false);
+        }
+    };
+
     const toggleExpand = async () => {
         const nextState = !isExpanded;
         setIsExpanded(nextState);
 
         if (nextState && quizzes.length === 0) {
-            setLoadingQuizzes(true);
-            try {
-                const data = await getAdminQuizzes(quizpack.id);
-                setQuizzes(data);
-            } catch {
-                toast.error('퀴즈 목록을 불러오지 못했습니다.');
-            } finally {
-                setLoadingQuizzes(false);
-            }
+            loadQuizzes();
         }
     };
 
@@ -308,12 +328,12 @@ export function QuizpackItem({ quizpack, orderInfo }: QuizpackItemProps) {
                                         <tr key={quiz.id} className="hover:bg-indigo-500/5 transition-colors group">
                                             <td className="px-4 py-4 font-mono text-slate-400">#{quiz.quiz_order}</td>
                                             <td className="px-4 py-4">
-                                                <span className="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-400 uppercase text-[10px] font-bold">
-                                                    {quiz.quiz_type}
+                                                <span className="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-400 text-[10px] font-bold">
+                                                    {QUIZ_TYPE_LABELS[quiz.quiz_type] || quiz.quiz_type}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-4">
-                                                <span className="text-slate-300 font-medium">중</span> {/* TODO: 난이도 라벨 매핑 */}
+                                                <span className="text-slate-300 font-medium">{DIFFICULTY_LABELS[quiz.difficulty_id] || '-'}</span>
                                             </td>
                                             <td className="px-4 py-4">
                                                 <p className="line-clamp-1 text-slate-400 group-hover:text-white transition-colors">
@@ -321,10 +341,15 @@ export function QuizpackItem({ quizpack, orderInfo }: QuizpackItemProps) {
                                                 </p>
                                             </td>
                                             <td className="px-4 py-4">
-                                                <div className={cn(
-                                                    "w-2 h-2 rounded-full",
-                                                    quiz.is_active ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-700"
-                                                )} />
+                                                <div className="flex items-center gap-1.5">
+                                                    <div className={cn(
+                                                        "w-2 h-2 rounded-full",
+                                                        quiz.is_active ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-700"
+                                                    )} />
+                                                    <span className={cn("text-[10px] font-bold", quiz.is_active ? "text-emerald-400" : "text-slate-500")}>
+                                                        {quiz.is_active ? "ON" : "OFF"}
+                                                    </span>
+                                                </div>
                                             </td>
                                             <td className="px-4 py-4 text-right flex items-center justify-end gap-1">
                                                 <Button
@@ -335,7 +360,13 @@ export function QuizpackItem({ quizpack, orderInfo }: QuizpackItemProps) {
                                                 >
                                                     <Eye className="w-4 h-4" />
                                                 </Button>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-white">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-slate-500 hover:text-white"
+                                                    onClick={() => setEditQuizId(quiz.id)}
+                                                    title="상세/수정"
+                                                >
                                                     <Edit3 className="w-4 h-4" />
                                                 </Button>
                                             </td>
@@ -354,6 +385,16 @@ export function QuizpackItem({ quizpack, orderInfo }: QuizpackItemProps) {
                     open={previewQuizId !== null}
                     quizId={previewQuizId}
                     onClose={() => setPreviewQuizId(null)}
+                />
+            )}
+
+            {/* 상세/수정 모달 */}
+            {editQuizId !== null && (
+                <QuizDetailModal
+                    open={editQuizId !== null}
+                    quizId={editQuizId}
+                    onClose={() => setEditQuizId(null)}
+                    onSaved={loadQuizzes}
                 />
             )}
         </div>

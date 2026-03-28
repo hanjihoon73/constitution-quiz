@@ -1,18 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-    Dialog, 
-    DialogContent, 
-    DialogHeader, 
-    DialogTitle 
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { QuizContent } from '@/components/quiz/QuizContent';
 import { getQuizDetail } from '@/actions/admin/contents_detail';
 import { Quiz, QuizChoice } from '@/lib/api/quiz';
 import { toast } from 'sonner';
-import { RefreshCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface QuizPreviewModalProps {
@@ -24,7 +23,7 @@ interface QuizPreviewModalProps {
 export function QuizPreviewModal({ quizId, open, onClose }: QuizPreviewModalProps) {
     const [loading, setLoading] = useState(false);
     const [quizData, setQuizData] = useState<Quiz | null>(null);
-    
+
     // Quiz interactive states
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [blankAnswers, setBlankAnswers] = useState<Map<number, number>>(new Map());
@@ -52,7 +51,7 @@ export function QuizPreviewModal({ quizId, open, onClose }: QuizPreviewModalProp
         setLoading(true);
         try {
             const rawData = await getQuizDetail(id);
-            
+
             // Transform to Quiz interface (CamelCase)
             const transformedQuiz: Quiz = {
                 id: rawData.id,
@@ -72,7 +71,7 @@ export function QuizPreviewModal({ quizId, open, onClose }: QuizPreviewModalProp
                     blankPosition: c.blank_position
                 }))
             };
-            
+
             setQuizData(transformedQuiz);
         } catch (error) {
             toast.error('퀴즈 상세 정보를 불러오지 못했습니다.');
@@ -84,7 +83,7 @@ export function QuizPreviewModal({ quizId, open, onClose }: QuizPreviewModalProp
 
     const handleSelectChoice = (choiceId: number) => {
         if (isChecked) return;
-        
+
         if (quizData?.quizType === 'multiple' || quizData?.quizType === 'truefalse') {
             setSelectedIds([choiceId]);
         }
@@ -123,17 +122,8 @@ export function QuizPreviewModal({ quizId, open, onClose }: QuizPreviewModalProp
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-white border-none rounded-3xl">
-                <DialogHeader className="p-6 bg-slate-900 text-white flex flex-row items-center justify-between">
+                <DialogHeader className="p-6 bg-slate-900 text-white">
                     <DialogTitle className="text-xl font-bold">퀴즈 미리보기</DialogTitle>
-                    <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={resetStates}
-                        className="text-slate-400 hover:text-white"
-                    >
-                        <RefreshCcw className="w-4 h-4 mr-2" />
-                        다시풀기
-                    </Button>
                 </DialogHeader>
 
                 <div className="max-h-[80vh] overflow-y-auto bg-slate-50">
@@ -141,7 +131,7 @@ export function QuizPreviewModal({ quizId, open, onClose }: QuizPreviewModalProp
                         <div className="py-40 text-center text-slate-400 animate-pulse font-medium">퀴즈 로딩 중...</div>
                     ) : quizData ? (
                         <div className="pb-24">
-                            <QuizContent 
+                            <QuizContent
                                 quiz={quizData}
                                 selectedIds={selectedIds}
                                 blankAnswers={blankAnswers}
@@ -158,21 +148,29 @@ export function QuizPreviewModal({ quizId, open, onClose }: QuizPreviewModalProp
                 </div>
 
                 {/* Footer Action */}
-                {!loading && quizData && (
-                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-slate-100 flex justify-center">
-                        <Button 
-                            onClick={isChecked ? resetStates : handleCheck}
-                            className={cn(
-                                "w-full max-w-sm h-12 rounded-2xl font-bold text-lg transition-all duration-300",
-                                isChecked 
-                                    ? "bg-slate-200 text-slate-600 hover:bg-slate-300"
-                                    : "bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-600/30"
-                            )}
-                        >
-                            {isChecked ? '다시 도전하기' : '정답 확인하기'}
-                        </Button>
-                    </div>
-                )}
+                {!loading && quizData && (() => {
+                    // 답안 선택 여부 확인 로직 (한 개라도 선택/빈칸 채우면 완료로 간주)
+                    const isAnswerIncomplete = quizData.quizType === 'choiceblank' 
+                        ? blankAnswers.size === 0 
+                        : selectedIds.length === 0;
+                    
+                    return (
+                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-slate-100 flex justify-center">
+                            <Button
+                                onClick={isChecked ? resetStates : handleCheck}
+                                disabled={!isChecked && isAnswerIncomplete}
+                                className={cn(
+                                    "w-full max-w-sm h-12 rounded-2xl font-bold text-lg transition-all duration-300",
+                                    isChecked
+                                        ? "bg-slate-200 text-slate-600 hover:bg-slate-300"
+                                        : "bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-600/30 disabled:opacity-50 disabled:shadow-none"
+                                )}
+                            >
+                                {isChecked ? '다시 풀기' : '정답 확인'}
+                            </Button>
+                        </div>
+                    );
+                })()}
             </DialogContent>
         </Dialog>
     );
