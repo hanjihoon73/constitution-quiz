@@ -1,4 +1,5 @@
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import Image from 'next/image';
 
 export default function AdminLayout({
     children,
@@ -15,6 +16,13 @@ export default function AdminLayout({
                         <span>/</span>
                         <span className="text-white">Dashboard</span>
                     </div>
+                    <Image
+                        src="/ci_cognity_blue&white.svg"
+                        alt="Cognity CI"
+                        width={100}
+                        height={20}
+                        className="h-[20px] w-auto opacity-80 hover:opacity-100 transition-opacity"
+                    />
                 </header>
                 <div className="flex-1 overflow-hidden flex flex-col p-8 min-h-0">
                     {children}

@@ -1,6 +1,5 @@
 import { getAdminActivities } from '@/actions/admin/activities';
 import { ActivitiesClient } from '@/components/admin/ActivitiesClient';
-import { Activity } from 'lucide-react';
 
 export default async function AdminActivitiesPage() {
     // 1. 서버 사이드 데이터 집계 페치
@@ -10,8 +9,7 @@ export default async function AdminActivitiesPage() {
         <div className="space-y-6 h-full flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
             <div>
-                <h2 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
-                    <Activity className="w-8 h-8 text-indigo-400" />
+                <h2 className="text-3xl font-bold text-white tracking-tight">
                     활동 관리
                 </h2>
                 <p className="text-slate-400 mt-1">

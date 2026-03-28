@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { 
-    LayoutDashboard, 
-    Users, 
-    BookOpen, 
-    Activity, 
-    Wrench, 
+import {
+    LayoutDashboard,
+    Users,
+    BookOpen,
+    Activity,
+    Wrench,
     LogOut,
     ChevronRight
 } from 'lucide-react';
@@ -15,8 +16,8 @@ import { cn } from '@/lib/utils';
 
 const menuItems = [
     { name: '대시보드', href: '/admin', icon: LayoutDashboard },
-    { name: '사용자 관리', href: '/admin/users', icon: Users },
     { name: '콘텐츠 관리', href: '/admin/contents', icon: BookOpen },
+    { name: '사용자 관리', href: '/admin/users', icon: Users },
     { name: '활동 관리', href: '/admin/activities', icon: Activity },
     { name: '리그 테스트', href: '/admin/league-test', icon: Wrench },
 ];
@@ -42,8 +43,8 @@ export function AdminSidebar() {
                             href={item.href}
                             className={cn(
                                 "flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group",
-                                isActive 
-                                    ? "bg-indigo-600/10 text-indigo-400 border border-indigo-600/20" 
+                                isActive
+                                    ? "bg-indigo-600/10 text-indigo-400 border border-indigo-600/20"
                                     : "hover:bg-slate-800 hover:text-white"
                             )}
                         >
@@ -63,10 +64,10 @@ export function AdminSidebar() {
             <div className="p-4 border-t border-slate-800">
                 <Link
                     href="/"
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-rose-500/10 hover:text-rose-400 transition-all duration-200 border border-transparent hover:border-rose-500/20"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-indigo-500/10 hover:text-indigo-400 transition-all duration-200 border border-transparent hover:border-indigo-500/20"
                 >
-                    <LogOut className="w-5 h-5" />
-                    <span className="font-medium">사이트로 돌아가기</span>
+                    <Image src="/bi-constitution-quiz-symbol-white.svg" alt="모두의 헌법 로고" width={20} height={20} className="w-5 h-5 opacity-70" />
+                    <span className="font-medium">모두의 헌법으로 가기 →</span>
                 </Link>
             </div>
         </aside>

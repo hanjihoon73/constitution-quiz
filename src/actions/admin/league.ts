@@ -4,11 +4,15 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 /**
- * 새로운 리그를 즉시 생성합니다 (RPC 호출).
+ * [Phase 1] test-league.html 복원을 위한 원형 매크로 RPC 액션 포팅
  */
-export async function createLeague() {
+
+/**
+ * 가짜(더미) 주간 리그 참가 유저들을 생성합니다.
+ */
+export async function createDummyLeagueUsers() {
     const supabase = createAdminClient();
-    const { data, error } = await supabase.rpc('create_league');
+    const { data, error } = await supabase.rpc('create_dummy_league_users');
 
     if (error) throw error;
     revalidatePath('/admin/league-test');
@@ -16,11 +20,11 @@ export async function createLeague() {
 }
 
 /**
- * 현재 활성화된 리그를 강제로 종료하고 정산합니다 (RPC 호출).
+ * 가짜(더미) 주간 리그 참가 유저들을 일괄 삭제합니다.
  */
-export async function endLeague() {
+export async function deleteDummyLeagueUsers() {
     const supabase = createAdminClient();
-    const { data, error } = await supabase.rpc('end_league');
+    const { data, error } = await supabase.rpc('delete_dummy_league_users');
 
     if (error) throw error;
     revalidatePath('/admin/league-test');
@@ -28,11 +32,11 @@ export async function endLeague() {
 }
 
 /**
- * 승격/강등 정산을 처리합니다 (RPC 호출).
+ * 더미 랭킹 데이터를 임의로 뒤섞고 무작위 갱신합니다.
  */
-export async function processPromotions() {
+export async function randomizeDummyLeagueScores() {
     const supabase = createAdminClient();
-    const { data, error } = await supabase.rpc('process_promotions');
+    const { data, error } = await supabase.rpc('randomize_dummy_league_scores');
 
     if (error) throw error;
     revalidatePath('/admin/league-test');
@@ -40,11 +44,11 @@ export async function processPromotions() {
 }
 
 /**
- * 리그 보상을 지급합니다 (RPC 호출).
+ * 주간 리그(정산 및 다음 주차 생성)를 강제 리셋합니다.
  */
-export async function distributeRewards() {
+export async function resetWeeklyLeague() {
     const supabase = createAdminClient();
-    const { data, error } = await supabase.rpc('distribute_rewards');
+    const { data, error } = await supabase.rpc('reset_weekly_league');
 
     if (error) throw error;
     revalidatePath('/admin/league-test');
@@ -52,29 +56,19 @@ export async function distributeRewards() {
 }
 
 /**
- * 가짜 리그 데이터를 생성합니다 (테스트용).
- */
-export async function generateFakeLeagueData() {
-    const supabase = createAdminClient();
-    const { data, error } = await supabase.rpc('generate_fake_league_data');
-
-    if (error) throw error;
-    revalidatePath('/admin/league-test');
-    return data;
-}
-
-/**
- * 현재 리그 상태 정보를 가져옵니다.
+ * (유지) 현재 활성화된 리그의 상태 정보를 조회합니다.
  */
 export async function getLeagueStatus() {
     const supabase = createAdminClient();
     
+    // 현재 active 상태인 리그를 하나 가져옴
     const { data: currentLeague } = await supabase
         .from('leagues')
         .select('*')
         .eq('status', 'active')
         .maybeSingle();
 
+    // 가져온 리그 ID를 바탕으로 참가자 수를 구함
     const { count: participants } = await supabase
         .from('user_leagues')
         .select('*', { count: 'exact', head: true })

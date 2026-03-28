@@ -16,6 +16,9 @@ export function ContentsClient({ quizpacks }: ContentsClientProps) {
     const [isModified, setIsModified] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
+    const totalQuizpacks = localPacks.length;
+    const totalQuizzes = localPacks.reduce((acc, pack) => acc + (Number(pack.quiz_count_all) || 0), 0);
+
     // props가 바뀌면 초기화
     // useEffect(() => { setLocalPacks(quizpacks); setIsModified(false); }, [quizpacks]); // 직접 수정 모드에서 훅 호출 문제 방지를 위해 주석, 필요 시 활성화
 
@@ -74,26 +77,36 @@ export function ContentsClient({ quizpacks }: ContentsClientProps) {
                     <span>퀴즈팩의 상/하 버튼으로 순서를 조정할 수 있습니다.</span>
                 </div>
 
-                {isModified && (
-                    <div className="flex items-center gap-2 animate-in fade-in zoom-in-95 duration-200">
-                        <Button
-                            variant="ghost"
-                            onClick={handleCancelOrders}
-                            disabled={isSaving}
-                            className="text-slate-400 hover:text-white"
-                        >
-                            취소
-                        </Button>
-                        <Button
-                            onClick={handleSaveOrders}
-                            disabled={isSaving}
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold gap-2 shadow-lg shadow-indigo-600/20"
-                        >
-                            <Save className="w-4 h-4" />
-                            {isSaving ? '저장 중...' : '변경된 순서 저장'}
-                        </Button>
+                <div className="flex items-center gap-6 text-right">
+                    {isModified && (
+                        <div className="flex items-center gap-2 animate-in fade-in zoom-in-95 duration-200">
+                            <Button
+                                variant="ghost"
+                                onClick={handleCancelOrders}
+                                disabled={isSaving}
+                                className="text-slate-400 hover:text-white"
+                            >
+                                취소
+                            </Button>
+                            <Button
+                                onClick={handleSaveOrders}
+                                disabled={isSaving}
+                                className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold gap-2 shadow-lg shadow-indigo-600/20"
+                            >
+                                <Save className="w-4 h-4" />
+                                {isSaving ? '저장 중...' : '변경된 순서 저장'}
+                            </Button>
+                        </div>
+                    )}
+
+                    <div className="space-y-1.5 ml-auto pr-4">
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">퀴즈팩 및 퀴즈 개수</p>
+                        <p className="text-sm text-slate-400">
+                            <span className="text-gray-400 font-bold">{totalQuizpacks}</span> / {' '}
+                            <span className="text-indigo-400 font-bold">{totalQuizzes}</span>
+                        </p>
                     </div>
-                )}
+                </div>
             </div>
 
             {/* 스크롤 영역: 퀴즈팩 목록 */}
