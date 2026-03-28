@@ -1,13 +1,13 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 /**
  * 퀴즈팩 목록을 가져옵니다 (순서 정보 포함).
  */
 export async function getAdminQuizpacks() {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     
     const { data, error } = await supabase
         .from('quizpacks')
@@ -33,7 +33,7 @@ export async function getAdminQuizpacks() {
  * 특정 퀴즈팩에 속한 퀴즈 목록을 가져옵니다.
  */
 export async function getAdminQuizzes(quizpackId: number) {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data, error } = await supabase
         .from('quizzes')
         .select('*')
@@ -57,7 +57,7 @@ export async function updateQuizpack(id: number, data: {
     keywords?: string;
     is_active?: boolean;
 }) {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { error } = await supabase
         .from('quizpacks')
         .update({
@@ -74,7 +74,7 @@ export async function updateQuizpack(id: number, data: {
  * 퀴즈팩 노출 순서를 변경합니다.
  */
 export async function updateQuizpackOrder(orders: { id: number; order: number }[]) {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     
     const updates = orders.map(item => ({
         quizpack_id: item.id,
@@ -93,7 +93,7 @@ export async function updateQuizpackOrder(orders: { id: number; order: number }[
  * 퀴즈 상세 정보를 업데이트합니다.
  */
 export async function updateQuiz(id: number, data: any) {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { error } = await supabase
         .from('quizzes')
         .update({
@@ -110,7 +110,7 @@ export async function updateQuiz(id: number, data: any) {
  * 퀴즈 보기(Choices)를 업데이트합니다.
  */
 export async function updateQuizChoices(quizId: number, choices: any[]) {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     
     // 기존 보기 삭제 후 재삽입 (단순화된 방식)
     const { error: deleteError } = await supabase

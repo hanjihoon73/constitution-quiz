@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 export interface UserFilter {
@@ -17,7 +17,7 @@ export interface UserFilter {
  * 사용자 목록을 필터링 및 검색 조건에 맞춰 가져옵니다.
  */
 export async function getAdminUsers(filters: UserFilter = {}) {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     
     let query = supabase
         .from('users')
@@ -59,8 +59,40 @@ export async function getAdminUsers(filters: UserFilter = {}) {
         return { users: [], total: 0 };
     }
 
-    return { users: data || [], total: count || 0 };
+    const users = data || [];
+
+    // 4. 마지막 로그인 조회 (user_login_history에서 각 유저별 최근 login action 시각)
+    if (users.length > 0) {
+        const userIds = users.map((u) => u.id);
+        const { data: loginHistory } = await supabase
+            .from('user_login_history')
+            .select('user_id, created_at')
+            .in('user_id', userIds)
+            .eq('action', 'login')
+            .order('created_at', { ascending: false });
+
+        // 유저별 최근 로그인 시각 맵 생성
+        const lastLoginMap: Record<number, string> = {};
+        if (loginHistory) {
+            for (const log of loginHistory) {
+                if (!lastLoginMap[log.user_id]) {
+                    lastLoginMap[log.user_id] = log.created_at;
+                }
+            }
+        }
+
+        // 유저 데이터에 병합
+        const usersWithLastLogin = users.map((u) => ({
+            ...u,
+            last_login_at: lastLoginMap[u.id] || null,
+        }));
+
+        return { users: usersWithLastLogin, total: count || 0 };
+    }
+
+    return { users, total: count || 0 };
 }
+
 
 /**
  * 사용자 정보를 업데이트합니다.
@@ -72,7 +104,7 @@ export async function updateAdminUser(userId: number, updateData: {
     is_active?: boolean;
     is_test?: boolean;
 }) {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // 닉네임 중복 체크 (수정하려는 경우에만)
     if (updateData.nickname) {
@@ -109,7 +141,7 @@ export async function updateAdminUser(userId: number, updateData: {
  * 타이틀 목록을 가져옵니다 (수정 팝업용).
  */
 export async function getXpTitles() {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data } = await supabase
         .from('total_xp_titles')
         .select('*')
@@ -117,3 +149,21 @@ export async function getXpTitles() {
     
     return data || [];
 }
+
+/**
+ * 닉네임 중복 여부를 확인합니다 (실시간 체크용).
+ * @param nickname 확인할 닉네임
+ * @param excludeUserId 본인 id (중복 체크에서 제외)
+ */
+export async function checkNicknameDuplicate(nickname: string, excludeUserId: number): Promise<boolean> {
+    const supabase = createAdminClient();
+    const { data } = await supabase
+        .from('users')
+        .select('id')
+        .eq('nickname', nickname)
+        .neq('id', excludeUserId)
+        .maybeSingle();
+
+    return !!data; // true = 중복 있음
+}
+

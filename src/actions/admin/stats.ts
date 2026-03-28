@@ -1,13 +1,13 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { startOfDay, subDays, format } from 'date-fns';
 
 /**
  * KST(한국 표준시) 기준으로 날짜 범위를 계산하여 대시보드 통계를 가져옵니다.
  */
 export async function getDashboardStats() {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // 1. 현재 시각 기준 KST 날짜 설정 (서버 타임존이 UTC일 경우 대비)
     // +9시간을 더해 KST로 변환 후 00:00:00 구함

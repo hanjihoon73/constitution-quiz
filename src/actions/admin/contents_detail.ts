@@ -1,12 +1,12 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
  * 퀴즈에 대한 모든 정보(보기 포함)를 가져옵니다.
  */
 export async function getQuizDetail(quizId: number) {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     
     const { data: quiz, error: quizError } = await supabase
         .from('quizzes')

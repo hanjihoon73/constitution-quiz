@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
  * 사용자 활동 로그(XP 획득 등)를 가져옵니다.
@@ -10,7 +10,7 @@ export async function getAdminActivityLogs(filters: {
     search?: string;
     limit?: number;
 } = {}) {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     let query = supabase
         .from('user_xp_history')
@@ -47,7 +47,7 @@ export async function getAdminActivityLogs(filters: {
  * 서비스 지표 통계를 가져옵니다 (대시보드 차트용 등).
  */
 export async function getServiceMetrics() {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     
     // 최근 7일간의 날짜별 가입자 수 등 (샘플)
     const { data, error } = await supabase

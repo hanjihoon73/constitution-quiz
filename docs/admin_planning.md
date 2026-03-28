@@ -40,18 +40,20 @@ Created: 2025년 5월 28일 오후 11:44
         9. 퀴즈 상세 팝업: 퀴즈 유형(3가지)별로 문제, 지문, 보기, 정답, 힌트, 해설을 조회하고 수정할 수 있어야 함
 4. **사용자 관리:**
     1. 검색: id / 닉네임 → 실시간 조회 방식
-    2. 필터: 계정 종류(google, kakao) / 권한(user, admin) / 상태(true, false) / 테스트 계정(true, false) → 필터 간 중복 적용 가능
-    3. 정렬: id(default 오름차순) / 가입 일시
+    2. 필터: 계정 종류(all, google, kakao) / 권한(all, user, admin) / 상태(all, true, false) / 테스트 계정(all, true, false) → 필터 간 중복 적용 가능
+    3. 정렬: id(default 오름차순) / 가입일시 / 마지막 로그인
     4. 사용자 목록 표시 정보:
         1. id → `users.id`
-        2. 계정 종류 → `users.rovider`
+        2. 계정 종류 → `users.provider`
         3. 닉네임 → `users.nickname`
-        4. 권한 → `users.role`
-        5. 상태: true=”On” / false = “Off” → `users.is_active`
-        6. 가입 일시 → `users.created_at`
-        7. 테스트 계정: true=”Y” / false=”N” → `users.is_test`
-        8. [수정] 버튼 → 클릭 → 사용자 정보 팝업 표시
-        9. 사용자 정보 팝업
+        4. 타이틀 → `users.title`
+        5. 권한 → `users.role`
+        6. 상태: true=”On” / false = “Off” → `users.is_active`
+        7. 가입 일시 → `users.created_at`
+        8. 마지막 로그인 → `user_login_history`
+        9. 테스트 계정: true=”Y” / false=”N” → `users.is_test`
+        9. [수정] 버튼 → 클릭 → 사용자 정보 수정 팝업 표시
+        10. 사용자 정보 수정 팝업
             1. id / 계정 종류 / 가입 일시 수정 불가
             2. 닉네임 / 타이틀 / 권한 / 상태 / 테스트 계정 수정 가능
                 1. 닉네임 수정 시 중복 실시간 조회 및 안내
