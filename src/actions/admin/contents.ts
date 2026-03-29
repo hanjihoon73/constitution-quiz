@@ -13,7 +13,8 @@ export async function getAdminQuizpacks() {
         .from('quizpacks')
         .select(`
             *,
-            quizpack_loadmap (pack_order)
+            quizpack_loadmap (pack_order),
+            quizpack_statistics (average_rating)
         `)
         .eq('is_deleted', false)
         .order('id', { ascending: true });

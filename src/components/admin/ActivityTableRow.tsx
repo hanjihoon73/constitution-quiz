@@ -73,6 +73,19 @@ export function ActivityTableRow({ activity }: { activity: ActivityStat }) {
                 <span className="text-slate-400">{activity.weekly_total_packs_count}회</span>
             </td>
 
+            {/* 퀴즈팩 완료율 */}
+            <td className="px-4 py-3.5 text-right font-mono">
+                <span className={
+                    activity.quizpack_completion_rate >= 50
+                        ? 'text-emerald-400 font-bold'
+                        : activity.quizpack_completion_rate > 0
+                            ? 'text-sky-400 font-bold'
+                            : 'text-slate-600'
+                }>
+                    {activity.quizpack_completion_rate}%
+                </span>
+            </td>
+
             {/* 마지막 로그인 */}
             <td className="px-4 py-3.5 text-right">
                 <span className="text-xs text-slate-400 tabular-nums">{formatDateTime(activity.last_login_at)}</span>

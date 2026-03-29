@@ -12,6 +12,7 @@ import {
     Save,
     ArrowUp,
     ArrowDown,
+    Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -225,6 +226,22 @@ export function QuizpackItem({ quizpack, orderInfo }: QuizpackItemProps) {
 
                 {/* 우측 컨트롤 영역 */}
                 <div className="flex items-center gap-5 shrink-0">
+                    {/* 별점 */}
+                    <div className="text-center px-4 border-l border-slate-800">
+                        <p className="text-slate-500 text-xs mb-1">별점</p>
+                        {(() => {
+                            const rating = quizpack.quizpack_statistics?.average_rating;
+                            return rating != null ? (
+                                <p className="text-white font-bold flex items-center gap-1 justify-center">
+                                    <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                                    {Number(rating).toFixed(1)}
+                                </p>
+                            ) : (
+                                <p className="text-slate-600 font-bold">-</p>
+                            );
+                        })()}
+                    </div>
+
                     {/* 퀴즈수 / 최대 퀴즈수 */}
                     <div className="text-center px-4 border-l border-slate-800">
                         <p className="text-slate-500 text-xs mb-1">퀴즈 개수</p>

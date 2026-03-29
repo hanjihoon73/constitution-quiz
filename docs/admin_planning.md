@@ -16,6 +16,12 @@ Created: 2025년 5월 28일 오후 11:44
     4. WAU
     5. MAU
     6. Stickness = (DAU ÷ MAU) x 100
+    7. (추가)정답률 = (전체 정답 수 ÷ 전체 퀴즈 수) x 100
+    8. (추가)완료율 = (퀴즈팩 완료 사용자수 ÷ Active User) x 100
+    9. (추가)가장 빠른 사용자:
+        - 정의: quizpack_loadmap 기준 완료한 퀴즈팩의 pack_order가 가장 큰 사용자
+        - 표시 정보: 사용자 id, 닉네임, 완료한 퀴즈팩의 pack_order
+    10. (추가)별점: 별점이 기록된 모든 퀴즈팩의 별점 평균 average(quizpack_statistics.average_rating)
 3. **콘텐츠 관리:**
     1. 퀴즈팩에 속하는 퀴즈들을 표시하는 방식 (토글)
     2. 퀴즈팩 목록 표시 정보:
@@ -24,7 +30,10 @@ Created: 2025년 5월 28일 오후 11:44
         3. 최대 퀴즈수 → `quizpacks.quiz_max`
         4. 키워드 → `quizpacks.keywords`
         5. 상태:  true=”On” / false=”Off” → quizpacks.is_active
-        6. [수정] 버튼 → 클릭 → 수정 모드 전환
+        6. (추가)별점:
+            - quizpack_statistics.average_rating
+            - 별점 정보가 없으면 "-" 표시
+        7. [수정] 버튼 → 클릭 → 수정 모드 전환
             1. 퀴즈수, 최대 퀴즈수, 키워드, 상태 수정 가능 / id는 수정 불가
             2. [취소] 버튼 → 클릭 → 조회 모드 전환
             3. [저장] 버튼 → not null 조건 및 데이터 정합성 체크 → DB 업데이트
@@ -76,6 +85,7 @@ Created: 2025년 5월 28일 오후 11:44
         9. 평균 정답률 → `users.quizpack_avrg_correct`
         10. 주간 퀴즈팩 완료 개수 → `users.weekly_unique_packs_count`
         11. 주간 퀴즈팩 완료 횟수 → `users.weekly_total_packs_count`
-        12. 마지막 로그인 → `user_login_history`
+        12. (추가)퀴즈팩 완료율 → (사용자가 완료한 퀴즈팩 개수 ÷ 전체 퀴즈팩 개수) × 100
+        13. 마지막 로그인 → `user_login_history`
 6. **리그 테스트:**
-    1. /test-league.html 기능을 모두 옮겨올 것
+    1. /test-league.html 기능 중 '서비스페이지로 이동'을 제외한 모든 기능을 옮겨올 것

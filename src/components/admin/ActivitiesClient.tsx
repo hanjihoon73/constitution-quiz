@@ -146,6 +146,9 @@ export function ActivitiesClient({ initialActivities, total }: ActivitiesClientP
                                 <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right w-40 whitespace-nowrap">
                                     완료팩개수 / 팩완료횟수
                                 </th>
+                                <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right w-28 whitespace-nowrap">
+                                    완료율
+                                </th>
                                 <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right w-36 whitespace-nowrap">
                                     마지막 로그인
                                 </th>
