@@ -6,31 +6,8 @@ import { useAuth } from '@/components/auth';
 import { MobileFrame, Header } from '@/components/common';
 import { getWeeklyRanking, WeeklyRankingItem } from '@/lib/api/league';
 import { Trophy, Box, CircleCheckBig, ArrowLeft, RefreshCw, CircleHelp } from 'lucide-react';
+import { LeagueCountdown } from '@/components/league/LeagueCountdown';
 
-/** KST 기준 이번 주 기간 표시 문자열 */
-function getCurrentWeekLabel(): string {
-    const now = new Date();
-    const kstOffset = 9 * 60 * 60 * 1000;
-    const kstNow = new Date(now.getTime() + kstOffset);
-    const day = kstNow.getUTCDay();
-    const daysSince = day === 0 ? 6 : day - 1;
-
-    const monday = new Date(kstNow);
-    monday.setUTCDate(kstNow.getUTCDate() - daysSince);
-    monday.setUTCHours(0, 0, 0, 0);
-
-    const nextMonday = new Date(monday);
-    nextMonday.setUTCDate(monday.getUTCDate() + 7);
-
-    const fmt = (d: Date) => {
-        const yy = String(d.getUTCFullYear()).slice(2);
-        const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
-        const dd = String(d.getUTCDate()).padStart(2, '0');
-        return `${yy}.${mm}.${dd}`;
-    };
-
-    return `${fmt(monday)} ~ ${fmt(nextMonday)}`;
-}
 
 
 interface RankItemProps {
@@ -75,10 +52,10 @@ function RankItem({ item, animationDelay, isOpen, onToggle }: RankItemProps) {
         if (item.rank <= 3) {
             const medalSrc = item.rank === 1 ? '/medal_gold.svg' : item.rank === 2 ? '/medal_silver.svg' : '/medal_bronze.svg';
             return (
-                <div className="relative w-9 h-9 flex items-center justify-center flex-shrink-0">
+                <div className="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={medalSrc} alt={`rank ${item.rank}`} className="w-full h-full object-contain" />
-                    <span className="absolute inset-0 flex items-center justify-center text-[14px] font-bold text-white pb-2">
+                    <img src={medalSrc} alt={`rank ${item.rank}`} className="w-9 h-9 object-contain" />
+                    <span className="absolute inset-0 flex items-center justify-center text-[14px] font-bold text-white pb-1.5 pl-[1px]">
                         {item.rank}
                     </span>
                 </div>
@@ -147,7 +124,7 @@ function RankItem({ item, animationDelay, isOpen, onToggle }: RankItemProps) {
 
                 {/* 사용자 정보 (닉네임 + 타이틀) */}
                 <div className="flex-1 min-w-0 flex items-center gap-4">
-                    <span className={`text-[16px] ${isMe ? 'font-bold' : 'font-medium'} text-gray-900 truncate`}>
+                    <span className={`text-[16px] ${isMe ? 'font-extrabold' : 'font-medium'} text-gray-900 truncate`}>
                         {item.nickname}
                     </span>
 
@@ -157,7 +134,7 @@ function RankItem({ item, animationDelay, isOpen, onToggle }: RankItemProps) {
                             <img src={`/${item.titleCode}.svg`} alt="" className="w-5 h-5 object-contain" />
                         )}
                         {item.title && (
-                            <div className="flex items-center justify-center px-3 h-5 bg-gray-200 rounded-full">
+                            <div className="flex items-center justify-center px-2 h-5 bg-gray-200 rounded-full">
                                 <span className="text-[12px] font-regular text-gray-900 leading-none">{item.title}</span>
                             </div>
                         )}
@@ -169,7 +146,7 @@ function RankItem({ item, animationDelay, isOpen, onToggle }: RankItemProps) {
 
                 {/* XP 정보 (우측 정렬) */}
                 <div className="flex flex-col items-end flex-shrink-0 gap-1">
-                    <span className="text-[16px] font-bold text-[#FF8400]">
+                    <span className="text-[14px] font-bold text-[#FF8400]">
                         {item.weeklyXp.toLocaleString('ko-KR')} XP
                     </span>
                     <span className="text-[10px] text-gray-400 font-medium whitespace-nowrap">
@@ -197,7 +174,6 @@ export default function LeaguePage() {
     const [openTooltipId, setOpenTooltipId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [weekLabel, setWeekLabel] = useState('');
 
     const loadRankings = useCallback(async (showRefreshing = false) => {
         if (!dbUser?.id) return;
@@ -216,10 +192,6 @@ export default function LeaguePage() {
             setIsRefreshing(false);
         }
     }, [dbUser?.id]);
-
-    useEffect(() => {
-        setWeekLabel(getCurrentWeekLabel());
-    }, []);
 
     useEffect(() => {
         if (isDbUserLoaded && dbUser?.id) {
@@ -294,15 +266,8 @@ export default function LeaguePage() {
                                 </div>
                             </div>
 
-                            {/* 리그 기간 표시 (캡슐 스타일) */}
-                            <div
-                                className="flex items-center justify-center px-4 py-1 rounded-full mb-2"
-                                style={{ backgroundColor: '#e9e9e9ff' }}
-                            >
-                                <span className="text-[12px] font-regular leading-4" style={{ color: '#2D2D2D' }}>
-                                    {weekLabel}
-                                </span>
-                            </div>
+                            {/* 리그 종료 카운트다운 */}
+                            <LeagueCountdown />
                         </div>
                     </div>
 
