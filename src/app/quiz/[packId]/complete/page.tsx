@@ -206,7 +206,7 @@ export default function QuizCompletePage() {
 
     // 다음 퀴즈팩으로 이동
     const handleNextQuizpack = () => {
-        if (packId % 3 === 0) {
+        if (packId % 4 === 0) {
             setPendingAction('next');
             setShowSponsor(true);
         } else {
@@ -216,7 +216,7 @@ export default function QuizCompletePage() {
 
     // 홈으로 이동
     const handleGoHome = () => {
-        if (packId % 3 === 0) {
+        if (packId % 4 === 0) {
             setPendingAction('home');
             setShowSponsor(true);
         } else {
@@ -270,7 +270,7 @@ export default function QuizCompletePage() {
             }}>
                 <button
                     onClick={handleGoHome}
-                    className="hover:-translate-y-1 active:scale-95 transition-transform duration-200"
+                    className="hover:-translate-y-1 active:scale-90 transition-transform duration-200 cursor-pointer"
                     style={{
                         background: 'none',
                         border: 'none',

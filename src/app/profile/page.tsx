@@ -195,7 +195,7 @@ export default function ProfilePage() {
                 <div className="pl-4 pr-[20px] pt-4 flex justify-between items-center">
                     <button
                         onClick={() => router.push('/')}
-                        className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-transform duration-200 hover:-translate-y-0.5 active:scale-95 hover:text-gray-700 cursor-pointer"
+                        className="flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-transform duration-200 hover:-translate-y-0.5 active:scale-90 hover:text-gray-700 cursor-pointer"
                     >
                         <ArrowLeft size={24} />
                     </button>

@@ -133,36 +133,37 @@ export function QuizLayout({ children, navigation, onExit, isViewMode, pendingXp
                     {/* 좌측: 나가기 버튼 및 회차 표시 */}
                     <div className="flex items-center gap-2">
                         <button
-                        onClick={handleExitClick}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '32px',
-                            height: '32px',
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: '#6B7280',
-                            fontSize: '20px',
-                            transition: 'transform 0.2s ease', // 효과를 위한 transition 추가
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
-                        aria-label="나가기"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="19" y1="12" x2="5" y2="12"></line>
-                            <polyline points="12 19 5 12 12 5"></polyline>
-                        </svg>
-                    </button>
+                            onClick={handleExitClick}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '32px',
+                                height: '32px',
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: '#6B7280',
+                                fontSize: '20px',
+                                transition: 'transform 0.2s ease', // 효과를 위한 transition 추가
+                            }}
+                            className="active:scale-90 transition-transform duration-200 cursor-pointer"
+                            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+                            onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+                            aria-label="나가기"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="19" y1="12" x2="5" y2="12"></line>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                        </button>
 
-                    {/* 우측: 진행 회차 표시 (나가기 버튼 옆) */}
-                    {!isViewMode && completedCount !== undefined && (
-                        <span className="text-[12px] font-bold text-[#FF8400] bg-[#FFF3E6] px-2 py-[2px] rounded-full border border-[#FFD6A5]">
-                            {packId ? `${packId}번 퀴즈팩 - ` : ''}{completedCount + 1}회차
-                        </span>
-                    )}
+                        {/* 우측: 진행 회차 표시 (나가기 버튼 옆) */}
+                        {!isViewMode && completedCount !== undefined && (
+                            <span className="text-[12px] font-bold text-[#FF8400] bg-[#FFF3E6] px-2 py-[2px] rounded-full border border-[#FFD6A5]">
+                                {packId ? `${packId}번 퀴즈팩 - ` : ''}{completedCount + 1}회차
+                            </span>
+                        )}
                     </div>
 
                     {/* 우측: XP 표시 */}

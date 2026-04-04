@@ -304,7 +304,7 @@ function UserTableRow({ user }: { user: any }) {
                         'px-2 py-0.5 rounded-full text-[11px] font-bold border capitalize',
                         user.provider === 'kakao'
                             ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
-                            : 'bg-red-500/10 text-red-500 border-red-500/20'
+                            : 'bg-blue-500/10 text-blue-500 border-blue-500/20'
                     )}>
                         {user.provider || 'Email'}
                     </span>
@@ -336,8 +336,8 @@ function UserTableRow({ user }: { user: any }) {
                 <td className="px-4 py-3.5">
                     <span className={cn(
                         'px-2.5 py-1 rounded-full text-[11px] font-bold border',
-                        user.is_active 
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                        user.is_active
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                             : 'bg-slate-800/50 text-slate-400 border-slate-700/50'
                     )}>
                         {user.is_active ? 'ON' : 'OFF'}
