@@ -52,7 +52,7 @@ function RankItem({ item, animationDelay, isOpen, onToggle }: RankItemProps) {
         if (item.rank <= 3) {
             const medalSrc = item.rank === 1 ? '/medal_gold.svg' : item.rank === 2 ? '/medal_silver.svg' : '/medal_bronze.svg';
             return (
-                <div className="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+                <div className="relative w-12 flex items-center justify-center flex-shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={medalSrc} alt={`rank ${item.rank}`} className="w-9 h-9 object-contain" />
                     <span className="absolute inset-0 flex items-center justify-center text-[14px] font-bold text-white pb-1.5 pl-[1px]">
@@ -62,7 +62,7 @@ function RankItem({ item, animationDelay, isOpen, onToggle }: RankItemProps) {
             );
         }
         return (
-            <div className="w-12 text-center flex-shrink-0">
+            <div className="w-12 flex items-center justify-center flex-shrink-0">
                 <span className={`text-[19px] font-bold ${isMe ? 'text-gray-700' : 'text-gray-400'}`}>
                     {item.rank}
                 </span>
@@ -113,7 +113,7 @@ function RankItem({ item, animationDelay, isOpen, onToggle }: RankItemProps) {
 
             <div
                 onClick={onToggle}
-                className={`flex items-center gap-4 px-4 py-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer ${isMe ? 'shadow-sm' : ''}`}
+                className={`flex items-center gap-4 pl-2 pr-4 py-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer ${isMe ? 'shadow-sm' : ''}`}
                 style={{
                     backgroundColor: isMe ? '#FFF8F1' : '#ffffff',
                     borderColor: isMe ? '#FF8400' : '#DBDBDB',
@@ -129,10 +129,6 @@ function RankItem({ item, animationDelay, isOpen, onToggle }: RankItemProps) {
                     </span>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
-                        {item.titleCode && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={`/${item.titleCode}.svg`} alt="" className="w-5 h-5 object-contain" />
-                        )}
                         {item.title && (
                             <div className="flex items-center justify-center px-2 h-5 bg-gray-200 rounded-full">
                                 <span className="text-[12px] font-regular text-gray-900 leading-none">{item.title}</span>
