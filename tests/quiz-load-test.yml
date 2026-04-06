@@ -1,0 +1,100 @@
+# ===================================================
+# 모두의 헌법 - 베타 v1.0 로드 테스트
+# ===================================================
+# 도구: Artillery (npm install -g artillery)
+# 실행: artillery run tests/quiz-load-test.yml
+# 리포트: artillery run --output report.json tests/quiz-load-test.yml
+#         artillery report report.json
+# ===================================================
+
+config:
+  target: "https://constitution-quiz.vercel.app"
+  phases:
+    # 1단계: 워밍업 (30초, 초당 1명)
+    - duration: 30
+      arrivalRate: 1
+      name: "워밍업"
+    # 2단계: 일반 트래픽 (60초, 초당 2명 → 약 120명)
+    - duration: 60
+      arrivalRate: 2
+      name: "베타 v1.0 일반 트래픽"
+    # 3단계: 피크 시뮬레이션 (30초, 초당 5명 → 약 150명)
+    - duration: 30
+      arrivalRate: 5
+      name: "피크 트래픽"
+
+  # 응답 성공 기준
+  ensure:
+    thresholds:
+      - http.response_time.p95: 3000   # p95 응답시간 3초 이내
+      - http.response_time.p99: 5000   # p99 응답시간 5초 이내
+
+  defaults:
+    headers:
+      User-Agent: "Artillery-LoadTest/1.0"
+
+scenarios:
+  # 시나리오 1: 비로그인 사용자 - 홈 → 로그인 페이지 조회
+  - name: "비로그인 사용자 흐름"
+    weight: 40
+    flow:
+      - get:
+          url: "/"
+          expect:
+            - statusCode: 200
+      - think: 2
+      - get:
+          url: "/login"
+          expect:
+            - statusCode: 200
+
+  # 시나리오 2: 퀴즈 페이지 직접 접속 (활성 퀴즈팩 ID 사용)
+  - name: "퀴즈 페이지 접속"
+    weight: 30
+    flow:
+      - get:
+          url: "/"
+          expect:
+            - statusCode: 200
+      - think: 1
+      - get:
+          url: "/quiz/1"
+          expect:
+            - statusCode:
+                - 200
+                - 307  # 미인증 시 리다이렉트 가능
+      - think: 3
+      - get:
+          url: "/quiz/2"
+          expect:
+            - statusCode:
+                - 200
+                - 307
+
+  # 시나리오 3: 리그(랭킹) 페이지 조회
+  - name: "리그 랭킹 페이지 조회"
+    weight: 20
+    flow:
+      - get:
+          url: "/"
+          expect:
+            - statusCode: 200
+      - think: 1
+      - get:
+          url: "/league"
+          expect:
+            - statusCode:
+                - 200
+                - 307
+
+  # 시나리오 4: 프로필 페이지 조회
+  - name: "프로필 페이지 조회"
+    weight: 10
+    flow:
+      - get:
+          url: "/profile"
+          expect:
+            - statusCode:
+                - 200
+                - 307
+      - think: 2
