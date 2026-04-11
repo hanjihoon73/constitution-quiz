@@ -389,14 +389,14 @@ export default function ProfilePage() {
                 {/* 서비스 문의 */}
                 <div className="px-4 pb-4 flex justify-center mt-2 animate-in fade-in duration-500 delay-700 fill-mode-both">
                     <p className="text-xs text-gray-400">
-                        이용 문의: cognityhelp@gmail.com
+                        이용 문의: hanjihoon73@gmail.com
                     </p>
                 </div>
 
                 {/* 이용약관 및 개인정보처리방침 */}
                 <div className="px-4 pb-4 flex justify-center animate-in fade-in duration-500 delay-700 fill-mode-both">
                     <a
-                        href="https://maperson.notion.site/2d2e387af28e804c94cecdf08c322ef6?source=copy_link"
+                        href="https://maperson.notion.site/beta-33fe387af28e80e884e2cf82092f51bd"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-muted-foreground/60 underline hover:text-foreground cursor-pointer transition-colors"
@@ -405,23 +405,10 @@ export default function ProfilePage() {
                     </a>
                 </div>
 
-                {/* 하단 영역 (CI 로고 + 저작권) */}
+                {/* 하단 영역 (저작권) */}
                 <div className="px-4 pb-12 flex flex-col items-center gap-2 mt-auto animate-in fade-in duration-500 delay-700 fill-mode-both">
-                    <a
-                        href="https://cognity.framer.website/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="transition-opacity hover:opacity-80"
-                    >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                            src="/ci_cognity.svg"
-                            alt="COGNITY"
-                            style={{ width: '110px', height: '22px', objectFit: 'contain' }}
-                        />
-                    </a>
                     <p className="text-xs text-gray-400">
-                        ⓒ 2025 COGNITY. All rights reserved.
+                        ⓒ 2026 Jihoon Han. All rights reserved.
                     </p>
                 </div>
             </main>

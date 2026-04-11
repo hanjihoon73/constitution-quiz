@@ -155,7 +155,7 @@ export default function LoginPage() {
                     <p className="mt-8 text-center text-xs text-muted-foreground/60 animate-fade-in-up delay-500">
                         로그인 시{' '}
                         <a
-                            href="https://maperson.notion.site/2d2e387af28e804c94cecdf08c322ef6?source=copy_link"
+                            href="https://maperson.notion.site/beta-33fe387af28e80e884e2cf82092f51bd"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="underline hover:text-foreground cursor-pointer transition-colors"
@@ -167,24 +167,10 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                {/* 하단 영역 (CI 로고 + 저작권) */}
+                {/* 하단 영역 (저작권) */}
                 <div className="mb-8 flex flex-col items-center gap-2 animate-fade-in-up delay-700">
-                    <a
-                        href="https://cognity.framer.website/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="transition-opacity hover:opacity-80"
-                    >
-                        <Image
-                            src="/ci_cognity.svg"
-                            alt="COGNITY"
-                            width={110}
-                            height={22}
-                            className="object-contain w-auto h-auto max-h-[22px]"
-                        />
-                    </a>
                     <p className="text-center text-xs text-gray-400">
-                        ⓒ 2025 COGNITY. All rights reserved.
+                        ⓒ 2026 Jihoon Han. All rights reserved.
                     </p>
                 </div>
             </div>

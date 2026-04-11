@@ -21,7 +21,7 @@ export function SponsorDialog({ isOpen, onClose }: SponsorDialogProps) {
 
     const handleCopy = async () => {
         try {
-            await navigator.clipboard.writeText('KB 839837-01-011166 코그니티');
+            await navigator.clipboard.writeText('우리은행 1002-856-209329 한지훈');
             setIsCopied(true);
             setTimeout(() => setIsCopied(false), 2000);
         } catch (error) {
@@ -75,7 +75,7 @@ export function SponsorDialog({ isOpen, onClose }: SponsorDialogProps) {
                                 후원계좌
                             </p>
                             <p className="text-[#111111] text-[16px] font-bold tracking-tight">
-                                KB 839837-01-011166 코그니티
+                                우리은행 1002-856-209329 한지훈
                             </p>
                             <p className="text-[#888888] text-[10px] font-normal mt-2">
                                 ※ 1회 최대 3만 원 이하의 소액 후원을 권장합니다.

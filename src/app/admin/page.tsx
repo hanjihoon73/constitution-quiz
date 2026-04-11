@@ -107,12 +107,12 @@ export default async function AdminDashboardPage() {
                             <div className="p-3 bg-sky-500/10 rounded-xl text-sky-400 group-hover:scale-110 transition-transform">
                                 <CheckCircle2 className="w-6 h-6" />
                             </div>
-                            <span className="text-xs text-slate-500 font-medium">대비 MAU</span>
+                            <span className="text-xs text-slate-500 font-medium">전체 사용자 대비</span>
                         </div>
                         <div>
-                            <p className="text-slate-400 text-sm font-medium">완료율 (퀴즈팩)</p>
+                            <p className="text-slate-400 text-sm font-medium">퀴즈팩 완료율</p>
                             <h3 className="text-2xl font-bold text-white mt-1">{stats.completionRate}%</h3>
-                            <p className="text-xs text-slate-500 mt-1">완료 사용자 수 ÷ MAU</p>
+                            <p className="text-xs text-slate-500 mt-1">모든 퀴즈팩 완료 사용자 수 ÷ 전체 사용자 수</p>
                         </div>
                     </div>
 

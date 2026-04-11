@@ -64,13 +64,44 @@ export async function getDashboardStats() {
         const totalQuiz = statData?.reduce((acc, r) => acc + (r.total_quiz_count ?? 0), 0) ?? 0;
         const correctRate = totalQuiz > 0 ? (totalCorrect / totalQuiz) * 100 : 0;
 
-        // ── 완료율 = (퀴즈팩 완료 사용자 수 ÷ MAU Active User) x 100 ──
+        // ── 완료율 = (모든 퀴즈팩을 완료한 사용자 수 ÷ 전체 유저 수) x 100 ──
+        // 완료 기준: 활성 퀴즈팩(is_active=true, is_deleted=false) 전체를 완료한 사용자
+        // 전체 유저: is_active = true, is_test = false
+
+        // 1) 활성 퀴즈팩 총 개수
+        const { count: totalActivePackCount } = await supabase
+            .from('quizpacks')
+            .select('id', { count: 'exact', head: true })
+            .eq('is_active', true)
+            .eq('is_deleted', false);
+        const totalPacks = totalActivePackCount ?? 0;
+
+        // 2) 사용자별 완료한 활성 퀴즈팩 수 집계
         const { data: completedData } = await supabase
             .from('user_quizpacks')
-            .select('user_id')
-            .eq('status', 'completed');
-        const completedUserCount = new Set(completedData?.map(r => r.user_id) ?? []).size;
-        const completionRate = mau > 0 ? (completedUserCount / mau) * 100 : 0;
+            .select('user_id, quizpack_id, quizpacks!inner(is_active, is_deleted)')
+            .eq('status', 'completed')
+            .eq('quizpacks.is_active', true)
+            .eq('quizpacks.is_deleted', false);
+
+        // 3) 사용자별 완료 퀴즈팩 수 집계 → 총 개수와 일치하는 사용자만 카운트
+        const userCompletedCount = new Map<number, Set<number>>();
+        for (const row of completedData ?? []) {
+            if (!userCompletedCount.has(row.user_id)) {
+                userCompletedCount.set(row.user_id, new Set());
+            }
+            userCompletedCount.get(row.user_id)!.add(row.quizpack_id);
+        }
+        const completedUserCount = totalPacks > 0
+            ? [...userCompletedCount.values()].filter(packs => packs.size >= totalPacks).length
+            : 0;
+
+        const { count: allUserCount } = await supabase
+            .from('users')
+            .select('id', { count: 'exact', head: true })
+            .eq('is_active', true)
+            .eq('is_test', false);
+        const completionRate = (allUserCount ?? 0) > 0 ? (completedUserCount / (allUserCount ?? 1)) * 100 : 0;
 
         // ── 가장 빠른 사용자: completed 퀴즈팩의 pack_order(quizpack_loadmap)가 가장 큰 사용자 ──
         // Step 1: completed 상태인 user_quizpacks와 loadmap을 조인하여 최고 pack_order 가진 레코드 추출
